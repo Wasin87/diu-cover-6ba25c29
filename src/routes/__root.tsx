@@ -33,10 +33,14 @@ export const Route = createRootRoute({
       { name: "description", content: "Generate beautiful Daffodil International University cover pages for Lab Reports, Assignments, and Lab Finals." },
       { name: "author", content: "DIU Cover Studio" },
       { property: "og:title", content: "DIU Cover Page Studio" },
-      { property: "og:description", content: "Generate beautiful Daffodil International University cover pages." },
+      { property: "og:description", content: "Generate beautiful Daffodil International University cover pages for Lab Reports, Assignments, and Lab Finals." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "DIU Cover Page Studio" },
+      { name: "twitter:description", content: "Generate beautiful Daffodil International University cover pages for Lab Reports, Assignments, and Lab Finals." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/be0b9729-8f20-4dff-8944-16ec09f52f6c" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/be0b9729-8f20-4dff-8944-16ec09f52f6c" },
     ],
     links: [
       {
