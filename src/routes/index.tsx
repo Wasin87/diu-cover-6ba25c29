@@ -464,8 +464,8 @@ ${showId ? `<div><b>Student ID:</b> ${data.studentId}</div>` : ""}
                 { label: "PDF", color: "#84CC16", fn: downloadPDF, icon: "📄" },
                 { label: "PNG", color: "#A3E635", fn: () => downloadImage("png"), icon: "🖼️" },
                 { label: "JPG", color: "#65A30D", fn: () => downloadImage("jpg"), icon: "📸" },
-                { label: "DOC", color: "#166534", fn: () => downloadDoc("doc"), icon: "📝" },
-                { label: "DOCX", color: "#4d7c0f", fn: () => downloadDoc("docx"), icon: "💾" },
+                { label: "DOC", color: "#166534", fn: downloadDoc, icon: "📝" },
+                { label: "DOCX", color: "#4d7c0f", fn: downloadDocx, icon: "💾" },
               ].map((b) => (
                 <button
                   key={b.label}
