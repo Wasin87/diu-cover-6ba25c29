@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { CoverPage, type CoverData, type CoverType, TOTAL } from "@/components/CoverPage";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
+import diuLogo from "@/assets/diu-logo.png";
 
 export const Route = createFileRoute("/")({
   component: Index,
