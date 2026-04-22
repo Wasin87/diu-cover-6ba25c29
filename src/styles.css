@@ -121,6 +121,13 @@ body {
 .a4-table th, .a4-table td {
   border: 1px solid #000; padding: 8px; font-size: 13px; vertical-align: middle;
 }
+/* Force safe colors inside cover page so html2canvas (no oklch support) works */
+.a4-page, .a4-page * {
+  border-color: #000 !important;
+  color: #000;
+  background-color: transparent;
+}
+.a4-page { background-color: #ffffff !important; }
 
 @media (max-width: 900px) {
   .a4-wrap { transform: scale(0.5); transform-origin: top center; }
