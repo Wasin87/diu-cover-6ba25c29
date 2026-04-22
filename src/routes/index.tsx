@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { CoverPage, type CoverData, type CoverType, TOTAL } from "@/components/CoverPage";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
+import diuLogo from "@/assets/diu-logo.png";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -116,17 +117,224 @@ function Index() {
     );
   };
 
-  const downloadDoc = (ext: "doc" | "docx") => {
-    const el = document.getElementById("cover-page");
-    if (!el) return;
-    const html = `<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>Cover</title></head><body>${el.outerHTML}</body></html>`;
+  const logoBase64Ref = useRef<string | null>(null);
+  const getLogoBase64 = async (): Promise<string> => {
+    if (logoBase64Ref.current) return logoBase64Ref.current;
+    const res = await fetch(diuLogo);
+    const blob = await res.blob();
+    const b64 = await new Promise<string>((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result as string);
+      r.onerror = reject;
+      r.readAsDataURL(blob);
+    });
+    logoBase64Ref.current = b64;
+    return b64;
+  };
+
+  const buildWordHtml = async (data: CoverData) => {
+    const logo = await getLogoBase64();
+    const title =
+      data.type === "lab-report"
+        ? "Lab Report"
+        : data.type === "assignment"
+          ? "Course Assignment Report"
+          : "Lab Final";
+    const total = TOTAL[data.type];
+    const criteria: [string, number][] =
+      data.type === "lab-report"
+        ? [["Understanding/Analysis", 7], ["Implementation", 8], ["Report Writing", 10]]
+        : data.type === "assignment"
+          ? [["Content Quality", 2], ["Clarity", 1], ["Spelling & Grammar", 1], ["Organization and Formatting", 1]]
+          : [["Understanding", 10], ["Analysis", 15], ["Implementation", 10], ["Report Writing", 5]];
+    const teacherLabel = data.type === "lab-final" ? "Teacher Name" : "Course Teacher Name";
+    const showId = data.type !== "assignment";
+    const rowsHtml = criteria
+      .map(
+        ([label, mark]) =>
+          `<tr><td style="border:1px solid #000;padding:6px;font-weight:bold;">${label}</td><td style="border:1px solid #000;padding:6px;text-align:center;font-weight:bold;">${mark}</td><td style="border:1px solid #000;padding:6px;">&nbsp;</td><td style="border:1px solid #000;padding:6px;">&nbsp;</td><td style="border:1px solid #000;padding:6px;">&nbsp;</td><td style="border:1px solid #000;padding:6px;">&nbsp;</td></tr>`,
+      )
+      .join("");
+    return `<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>Cover</title><!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]--><style>@page{size:A4;margin:1in;}body{font-family:'Times New Roman',serif;color:#000;}table{border-collapse:collapse;width:100%;}td{border:1px solid #000;padding:6px;}</style></head><body>
+<div style="text-align:center;margin-bottom:18px;"><img src="${logo}" style="height:140px;" alt="DIU"/></div>
+<h1 style="text-align:center;font-size:32pt;font-weight:normal;margin:10px 0 24px;">${title}</h1>
+<table><tbody>
+<tr><td colspan="6" style="text-align:center;font-weight:bold;">Only for course Teacher</td></tr>
+<tr style="font-weight:bold;text-align:center;"><td>&nbsp;</td><td>Needs Improvement</td><td>Developing</td><td>Sufficient</td><td>Above Average</td><td>Total Mark</td></tr>
+<tr style="text-align:center;font-weight:bold;"><td>Allocate mark &amp; Percentage</td><td>25%</td><td>50%</td><td>75%</td><td>100%</td><td>${total}</td></tr>
+${rowsHtml}
+<tr><td colspan="5" style="text-align:right;font-weight:bold;">Total obtained mark</td><td>&nbsp;</td></tr>
+<tr><td style="font-weight:bold;height:70px;">Comments</td><td colspan="5">&nbsp;</td></tr>
+</tbody></table>
+<div style="margin-top:30px;font-size:14pt;line-height:2;">
+<div style="font-weight:bold;font-size:16pt;">Semester: ${data.semester}</div>
+<div><b>Student Name:</b> ${data.studentName}</div>
+${showId ? `<div><b>Student ID:</b> ${data.studentId}</div>` : ""}
+<div><b>Batch:</b> ${data.batch} &nbsp;&nbsp;&nbsp;&nbsp;<b>Section:</b> ${data.section}</div>
+<div><b>Course Code:</b> ${data.courseCode}</div>
+<div><b>Course Name:</b> ${data.courseName}</div>
+<div><b>${teacherLabel}:</b> ${data.teacherName}</div>
+<div><b>Designation:</b> ${data.designation}</div>
+<div><b>Submission Date:</b> ${data.submissionDate}</div>
+</div></body></html>`;
+  };
+
+  const downloadDoc = async () => {
+    if (!generated) return;
+    const html = await buildWordHtml(generated);
     const blob = new Blob(["\ufeff", html], { type: "application/msword" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${fileBase()}.${ext}`;
+    a.download = `${fileBase()}.doc`;
+    document.body.appendChild(a);
     a.click();
+    a.remove();
     URL.revokeObjectURL(url);
+  };
+
+  const downloadDocx = async () => {
+    if (!generated) return;
+    const [docxMod, fsMod] = await Promise.all([import("docx"), import("file-saver")]);
+    const {
+      Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, ImageRun,
+      AlignmentType, WidthType, BorderStyle, HeightRule,
+    } = docxMod;
+    const { saveAs } = fsMod;
+
+    const data = generated;
+    const title =
+      data.type === "lab-report"
+        ? "Lab Report"
+        : data.type === "assignment"
+          ? "Course Assignment Report"
+          : "Lab Final";
+    const total = TOTAL[data.type];
+    const criteria: [string, number][] =
+      data.type === "lab-report"
+        ? [["Understanding/Analysis", 7], ["Implementation", 8], ["Report Writing", 10]]
+        : data.type === "assignment"
+          ? [["Content Quality", 2], ["Clarity", 1], ["Spelling & Grammar", 1], ["Organization and Formatting", 1]]
+          : [["Understanding", 10], ["Analysis", 15], ["Implementation", 10], ["Report Writing", 5]];
+    const teacherLabel = data.type === "lab-final" ? "Teacher Name" : "Course Teacher Name";
+    const showId = data.type !== "assignment";
+
+    const logoRes = await fetch(diuLogo);
+    const logoBuf = new Uint8Array(await logoRes.arrayBuffer());
+
+    const border = { style: BorderStyle.SINGLE, size: 6, color: "000000" };
+    const borders = { top: border, bottom: border, left: border, right: border };
+
+    const cell = (
+      text: string,
+      opts: { bold?: boolean; align?: "center" | "right" | "left"; cs?: number; height?: number } = {},
+    ) =>
+      new TableCell({
+        borders,
+        columnSpan: opts.cs,
+        children: [
+          new Paragraph({
+            alignment:
+              opts.align === "center"
+                ? AlignmentType.CENTER
+                : opts.align === "right"
+                  ? AlignmentType.RIGHT
+                  : AlignmentType.LEFT,
+            children: [new TextRun({ text, bold: opts.bold })],
+          }),
+        ],
+        ...(opts.height ? { height: { value: opts.height, rule: HeightRule.ATLEAST } } : {}),
+      });
+
+    const table = new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      rows: [
+        new TableRow({ children: [cell("Only for course Teacher", { bold: true, align: "center", cs: 6 })] }),
+        new TableRow({
+          children: [
+            cell("", { bold: true }),
+            cell("Needs Improvement", { bold: true, align: "center" }),
+            cell("Developing", { bold: true, align: "center" }),
+            cell("Sufficient", { bold: true, align: "center" }),
+            cell("Above Average", { bold: true, align: "center" }),
+            cell("Total Mark", { bold: true, align: "center" }),
+          ],
+        }),
+        new TableRow({
+          children: [
+            cell("Allocate mark & Percentage", { bold: true, align: "center" }),
+            cell("25%", { bold: true, align: "center" }),
+            cell("50%", { bold: true, align: "center" }),
+            cell("75%", { bold: true, align: "center" }),
+            cell("100%", { bold: true, align: "center" }),
+            cell(String(total), { bold: true, align: "center" }),
+          ],
+        }),
+        ...criteria.map(
+          ([label, mark]) =>
+            new TableRow({
+              children: [
+                cell(label, { bold: true }),
+                cell(String(mark), { bold: true, align: "center" }),
+                cell(""), cell(""), cell(""), cell(""),
+              ],
+            }),
+        ),
+        new TableRow({
+          children: [cell("Total obtained mark", { bold: true, align: "right", cs: 5 }), cell("")],
+        }),
+        new TableRow({
+          children: [cell("Comments", { bold: true, height: 1400 }), cell("", { cs: 5 })],
+        }),
+      ],
+    });
+
+    const info = (label: string, value: string) =>
+      new Paragraph({
+        spacing: { after: 120 },
+        children: [new TextRun({ text: `${label}: `, bold: true }), new TextRun(value)],
+      });
+
+    const doc = new Document({
+      sections: [
+        {
+          properties: { page: { margin: { top: 1080, right: 1080, bottom: 1080, left: 1080 } } },
+          children: [
+            new Paragraph({
+              alignment: AlignmentType.CENTER,
+              children: [
+                new ImageRun({
+                  type: "png",
+                  data: logoBuf,
+                  transformation: { width: 180, height: 180 },
+                }),
+              ],
+            }),
+            new Paragraph({
+              alignment: AlignmentType.CENTER,
+              spacing: { before: 200, after: 400 },
+              children: [new TextRun({ text: title, size: 56 })],
+            }),
+            table,
+            new Paragraph({
+              spacing: { before: 400, after: 120 },
+              children: [new TextRun({ text: `Semester: ${data.semester}`, bold: true, size: 28 })],
+            }),
+            info("Student Name", data.studentName),
+            ...(showId ? [info("Student ID", data.studentId)] : []),
+            info("Batch", `${data.batch}        Section: ${data.section}`),
+            info("Course Code", data.courseCode),
+            info("Course Name", data.courseName),
+            info(teacherLabel, data.teacherName),
+            info("Designation", data.designation),
+            info("Submission Date", data.submissionDate),
+          ],
+        },
+      ],
+    });
+
+    const blob = await Packer.toBlob(doc);
+    saveAs(blob, `${fileBase()}.docx`);
   };
 
   return (
@@ -256,8 +464,8 @@ function Index() {
                 { label: "PDF", color: "#84CC16", fn: downloadPDF, icon: "📄" },
                 { label: "PNG", color: "#A3E635", fn: () => downloadImage("png"), icon: "🖼️" },
                 { label: "JPG", color: "#65A30D", fn: () => downloadImage("jpg"), icon: "📸" },
-                { label: "DOC", color: "#166534", fn: () => downloadDoc("doc"), icon: "📝" },
-                { label: "DOCX", color: "#4d7c0f", fn: () => downloadDoc("docx"), icon: "💾" },
+                { label: "DOC", color: "#166534", fn: downloadDoc, icon: "📝" },
+                { label: "DOCX", color: "#4d7c0f", fn: downloadDocx, icon: "💾" },
               ].map((b) => (
                 <button
                   key={b.label}
