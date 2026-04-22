@@ -2,6 +2,133 @@
 @source "../src";
 @import "tw-animate-css";
 
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --lime-50: #F7FEE7;
+  --lime-100: #ECFCCB;
+  --lime-300: #A3E635;
+  --lime-500: #84CC16;
+  --lime-600: #65A30D;
+  --green-800: #166534;
+}
+
+.font-display { font-family: 'Playfair Display', serif; }
+.font-body { font-family: 'DM Sans', sans-serif; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(132,204,22,0.08), transparent 40%),
+    radial-gradient(circle at 80% 90%, rgba(101,163,13,0.08), transparent 40%),
+    #ffffff;
+  background-attachment: fixed;
+}
+
+.dot-grid {
+  background-image: radial-gradient(rgba(132,204,22,0.25) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.glass {
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(132,204,22,0.25);
+  box-shadow: 0 10px 40px -10px rgba(101,163,13,0.18);
+}
+
+.lime-glow {
+  box-shadow: 0 0 0 2px #84CC16, 0 0 30px rgba(132,204,22,0.45);
+}
+
+.btn-lime {
+  background: linear-gradient(135deg, #A3E635 0%, #84CC16 50%, #65A30D 100%);
+  color: white;
+  transition: transform .2s ease, box-shadow .2s ease;
+  position: relative;
+  overflow: hidden;
+}
+.btn-lime:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -10px rgba(101,163,13,0.6); }
+.btn-lime::after {
+  content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shimmer 2.5s infinite;
+}
+@keyframes shimmer { 100% { left: 100%; } }
+
+.float-label { position: relative; }
+.float-label input, .float-label textarea {
+  width: 100%; padding: 18px 12px 8px; background: white;
+  border: 1px solid #e5e7eb; border-bottom: 2px solid #d1d5db;
+  border-radius: 10px; outline: none; font-size: 15px;
+  transition: all .2s ease;
+}
+.float-label input:focus, .float-label textarea:focus {
+  background: #F7FEE7; border-bottom-color: #84CC16;
+  box-shadow: 0 0 0 3px rgba(132,204,22,0.15);
+}
+.float-label label {
+  position: absolute; left: 12px; top: 14px; color: #6b7280;
+  font-size: 14px; pointer-events: none; transition: all .2s ease;
+}
+.float-label input:focus + label,
+.float-label input:not(:placeholder-shown) + label,
+.float-label textarea:focus + label,
+.float-label textarea:not(:placeholder-shown) + label {
+  top: 4px; font-size: 11px; color: #65A30D; font-weight: 600;
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.slide-in-right { animation: slideInRight .5s ease both; }
+
+@keyframes float-up {
+  0% { transform: translateY(100vh) scale(0); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+}
+.particle {
+  position: absolute; bottom: 0; width: 8px; height: 8px;
+  background: #84CC16; border-radius: 50%;
+  animation: float-up linear infinite;
+}
+
+@keyframes spin-ring { to { transform: rotate(360deg); } }
+.spin-ring {
+  border: 4px solid #ECFCCB; border-top-color: #84CC16; border-right-color: #65A30D;
+  border-radius: 50%; animation: spin-ring 1s linear infinite;
+}
+
+@keyframes progress-bar {
+  0% { width: 0; } 100% { width: 100%; }
+}
+.progress-bar { animation: progress-bar 2s ease-out forwards; }
+
+@keyframes typewriter-blink { 50% { opacity: 0; } }
+.typewriter::after { content: '|'; animation: typewriter-blink 1s infinite; color: #84CC16; }
+
+/* A4 cover page */
+.a4-page {
+  width: 794px; min-height: 1123px; background: white; color: black;
+  padding: 60px 70px; box-sizing: border-box;
+  font-family: 'Times New Roman', Times, serif;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+.a4-table { width: 100%; border-collapse: collapse; }
+.a4-table th, .a4-table td {
+  border: 1px solid #000; padding: 8px; font-size: 13px; vertical-align: middle;
+}
+
+@media (max-width: 900px) {
+  .a4-wrap { transform: scale(0.5); transform-origin: top center; }
+}
+@media (max-width: 500px) {
+  .a4-wrap { transform: scale(0.38); transform-origin: top center; }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 /*
