@@ -1,11 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useRef, useState } from "react";
-import { CoverPage, type CoverData, type CoverType, TOTAL } from "@/components/CoverPage";
-import { LoadingOverlay } from "@/components/LoadingOverlay";
-import diuLogo from "@/assets/diu-logo.png";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { coverStore, useCoverStore } from "@/lib/cover-store";
+import type { CoverType } from "@/components/CoverPage";
 
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "DIU Cover Page Studio — Choose Cover Type" },
+      { name: "description", content: "Generate beautiful Daffodil International University cover pages for Lab Reports, Assignments, and Lab Finals." },
+    ],
+  }),
+  component: HomePage,
 });
 
 const TYPE_META: { id: CoverType; title: string; desc: string; total: number; icon: string }[] = [
@@ -14,386 +18,57 @@ const TYPE_META: { id: CoverType; title: string; desc: string; total: number; ic
   { id: "lab-final", title: "Lab Final", desc: "Understanding • Analysis • Impl • Report", total: 40, icon: "🎓" },
 ];
 
-const FIELD_GROUPS = [
-  {
-    title: "Student Info",
-    fields: [
-      { key: "studentName", label: "Student Name" },
-      { key: "studentId", label: "Student ID" },
-      { key: "batch", label: "Batch" },
-      { key: "section", label: "Section" },
-    ],
-  },
-  {
-    title: "Course Info",
-    fields: [
-      { key: "semester", label: "Semester" },
-      { key: "courseCode", label: "Course Code" },
-      { key: "courseName", label: "Course Name" },
-    ],
-  },
-  {
-    title: "Submission Details",
-    fields: [
-      { key: "teacherName", label: "Teacher Name" },
-      { key: "designation", label: "Designation" },
-      { key: "submissionDate", label: "Submission Date" },
-    ],
-  },
-] as const;
+function HomePage() {
+  const navigate = useNavigate();
+  const { selected } = useCoverStore();
 
-function Index() {
-  const [selected, setSelected] = useState<CoverType | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [generated, setGenerated] = useState<CoverData | null>(null);
-  const [activeTab, setActiveTab] = useState<string>("home");
-  const previewRef = useRef<HTMLDivElement>(null);
-
-  const [form, setForm] = useState<Omit<CoverData, "type">>({
-    semester: "",
-    studentName: "",
-    studentId: "",
-    batch: "",
-    section: "",
-    courseCode: "",
-    courseName: "",
-    teacherName: "",
-    designation: "",
-    submissionDate: "",
-  });
-
-  const update = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
-
-  const handleGenerate = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selected) return;
-    setLoading(true);
-    setTimeout(() => {
-      setGenerated({ ...form, type: selected });
-      setLoading(false);
-      setTimeout(() => {
-        document.getElementById("preview")?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
-    }, 2000);
-  };
-
-  const fileBase = () =>
-    `${selected ?? "cover"}-${(form.studentName || "student").replace(/\s+/g, "_")}`;
-
-  const downloadPDF = async () => {
-    const html2pdf = (await import("html2pdf.js")).default;
-    const el = document.getElementById("cover-page");
-    if (!el) return;
-    html2pdf()
-      .set({
-        margin: 0,
-        filename: `${fileBase()}.pdf`,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-      })
-      .from(el)
-      .save();
-  };
-
-  const downloadImage = async (type: "png" | "jpg") => {
-    const html2canvas = (await import("html2canvas")).default;
-    const el = document.getElementById("cover-page");
-    if (!el) return;
-    const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
-    const mime = type === "png" ? "image/png" : "image/jpeg";
-    canvas.toBlob(
-      (blob) => {
-        if (!blob) return;
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${fileBase()}.${type}`;
-        a.click();
-        URL.revokeObjectURL(url);
-      },
-      mime,
-      0.95,
-    );
-  };
-
-  const logoBase64Ref = useRef<string | null>(null);
-  const getLogoBase64 = async (): Promise<string> => {
-    if (logoBase64Ref.current) return logoBase64Ref.current;
-    const res = await fetch(diuLogo);
-    const blob = await res.blob();
-    const b64 = await new Promise<string>((resolve, reject) => {
-      const r = new FileReader();
-      r.onload = () => resolve(r.result as string);
-      r.onerror = reject;
-      r.readAsDataURL(blob);
-    });
-    logoBase64Ref.current = b64;
-    return b64;
-  };
-
-  const buildWordHtml = async (data: CoverData) => {
-    const logo = await getLogoBase64();
-    const title =
-      data.type === "lab-report"
-        ? "Lab Report"
-        : data.type === "assignment"
-          ? "Course Assignment Report"
-          : "Lab Final";
-    const total = TOTAL[data.type];
-    const criteria: [string, number][] =
-      data.type === "lab-report"
-        ? [["Understanding/Analysis", 7], ["Implementation", 8], ["Report Writing", 10]]
-        : data.type === "assignment"
-          ? [["Content Quality", 2], ["Clarity", 1], ["Spelling & Grammar", 1], ["Organization and Formatting", 1]]
-          : [["Understanding", 10], ["Analysis", 15], ["Implementation", 10], ["Report Writing", 5]];
-    const teacherLabel = data.type === "lab-final" ? "Teacher Name" : "Course Teacher Name";
-    const showId = data.type !== "assignment";
-    const rowsHtml = criteria
-      .map(
-        ([label, mark]) =>
-          `<tr><td style="border:1px solid #000;padding:6px;font-weight:bold;">${label}</td><td style="border:1px solid #000;padding:6px;text-align:center;font-weight:bold;">${mark}</td><td style="border:1px solid #000;padding:6px;">&nbsp;</td><td style="border:1px solid #000;padding:6px;">&nbsp;</td><td style="border:1px solid #000;padding:6px;">&nbsp;</td><td style="border:1px solid #000;padding:6px;">&nbsp;</td></tr>`,
-      )
-      .join("");
-    return `<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>Cover</title><!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]--><style>@page{size:A4;margin:1in;}body{font-family:'Times New Roman',serif;color:#000;}table{border-collapse:collapse;width:100%;}td{border:1px solid #000;padding:6px;}</style></head><body>
-<div style="text-align:center;margin-bottom:18px;"><img src="${logo}" style="height:140px;" alt="DIU"/></div>
-<h1 style="text-align:center;font-size:32pt;font-weight:normal;margin:10px 0 24px;">${title}</h1>
-<table><tbody>
-<tr><td colspan="6" style="text-align:center;font-weight:bold;">Only for course Teacher</td></tr>
-<tr style="font-weight:bold;text-align:center;"><td>&nbsp;</td><td>Needs Improvement</td><td>Developing</td><td>Sufficient</td><td>Above Average</td><td>Total Mark</td></tr>
-<tr style="text-align:center;font-weight:bold;"><td>Allocate mark &amp; Percentage</td><td>25%</td><td>50%</td><td>75%</td><td>100%</td><td>${total}</td></tr>
-${rowsHtml}
-<tr><td colspan="5" style="text-align:right;font-weight:bold;">Total obtained mark</td><td>&nbsp;</td></tr>
-<tr><td style="font-weight:bold;height:70px;">Comments</td><td colspan="5">&nbsp;</td></tr>
-</tbody></table>
-<div style="margin-top:30px;font-size:14pt;line-height:2;">
-<div style="font-weight:bold;font-size:16pt;">Semester: ${data.semester}</div>
-<div><b>Student Name:</b> ${data.studentName}</div>
-${showId ? `<div><b>Student ID:</b> ${data.studentId}</div>` : ""}
-<div><b>Batch:</b> ${data.batch} &nbsp;&nbsp;&nbsp;&nbsp;<b>Section:</b> ${data.section}</div>
-<div><b>Course Code:</b> ${data.courseCode}</div>
-<div><b>Course Name:</b> ${data.courseName}</div>
-<div><b>${teacherLabel}:</b> ${data.teacherName}</div>
-<div><b>Designation:</b> ${data.designation}</div>
-<div><b>Submission Date:</b> ${data.submissionDate}</div>
-</div></body></html>`;
-  };
-
-  const downloadDoc = async () => {
-    if (!generated) return;
-    const html = await buildWordHtml(generated);
-    const blob = new Blob(["\ufeff", html], { type: "application/msword" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${fileBase()}.doc`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  };
-
-  const downloadDocx = async () => {
-    if (!generated) return;
-    const [docxMod, fsMod] = await Promise.all([import("docx"), import("file-saver")]);
-    const {
-      Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, ImageRun,
-      AlignmentType, WidthType, BorderStyle, HeightRule,
-    } = docxMod;
-    const { saveAs } = fsMod;
-
-    const data = generated;
-    const title =
-      data.type === "lab-report"
-        ? "Lab Report"
-        : data.type === "assignment"
-          ? "Course Assignment Report"
-          : "Lab Final";
-    const total = TOTAL[data.type];
-    const criteria: [string, number][] =
-      data.type === "lab-report"
-        ? [["Understanding/Analysis", 7], ["Implementation", 8], ["Report Writing", 10]]
-        : data.type === "assignment"
-          ? [["Content Quality", 2], ["Clarity", 1], ["Spelling & Grammar", 1], ["Organization and Formatting", 1]]
-          : [["Understanding", 10], ["Analysis", 15], ["Implementation", 10], ["Report Writing", 5]];
-    const teacherLabel = data.type === "lab-final" ? "Teacher Name" : "Course Teacher Name";
-    const showId = data.type !== "assignment";
-
-    const logoRes = await fetch(diuLogo);
-    const logoBuf = new Uint8Array(await logoRes.arrayBuffer());
-
-    const border = { style: BorderStyle.SINGLE, size: 6, color: "000000" };
-    const borders = { top: border, bottom: border, left: border, right: border };
-
-    const cell = (
-      text: string,
-      opts: { bold?: boolean; align?: "center" | "right" | "left"; cs?: number; height?: number } = {},
-    ) =>
-      new TableCell({
-        borders,
-        columnSpan: opts.cs,
-        children: [
-          new Paragraph({
-            alignment:
-              opts.align === "center"
-                ? AlignmentType.CENTER
-                : opts.align === "right"
-                  ? AlignmentType.RIGHT
-                  : AlignmentType.LEFT,
-            children: [new TextRun({ text, bold: opts.bold })],
-          }),
-        ],
-        ...(opts.height ? { height: { value: opts.height, rule: HeightRule.ATLEAST } } : {}),
-      });
-
-    const table = new Table({
-      width: { size: 100, type: WidthType.PERCENTAGE },
-      rows: [
-        new TableRow({ children: [cell("Only for course Teacher", { bold: true, align: "center", cs: 6 })] }),
-        new TableRow({
-          children: [
-            cell("", { bold: true }),
-            cell("Needs Improvement", { bold: true, align: "center" }),
-            cell("Developing", { bold: true, align: "center" }),
-            cell("Sufficient", { bold: true, align: "center" }),
-            cell("Above Average", { bold: true, align: "center" }),
-            cell("Total Mark", { bold: true, align: "center" }),
-          ],
-        }),
-        new TableRow({
-          children: [
-            cell("Allocate mark & Percentage", { bold: true, align: "center" }),
-            cell("25%", { bold: true, align: "center" }),
-            cell("50%", { bold: true, align: "center" }),
-            cell("75%", { bold: true, align: "center" }),
-            cell("100%", { bold: true, align: "center" }),
-            cell(String(total), { bold: true, align: "center" }),
-          ],
-        }),
-        ...criteria.map(
-          ([label, mark]) =>
-            new TableRow({
-              children: [
-                cell(label, { bold: true }),
-                cell(String(mark), { bold: true, align: "center" }),
-                cell(""), cell(""), cell(""), cell(""),
-              ],
-            }),
-        ),
-        new TableRow({
-          children: [cell("Total obtained mark", { bold: true, align: "right", cs: 5 }), cell("")],
-        }),
-        new TableRow({
-          children: [cell("Comments", { bold: true, height: 1400 }), cell("", { cs: 5 })],
-        }),
-      ],
-    });
-
-    const info = (label: string, value: string) =>
-      new Paragraph({
-        spacing: { after: 120 },
-        children: [new TextRun({ text: `${label}: `, bold: true }), new TextRun(value)],
-      });
-
-    const doc = new Document({
-      sections: [
-        {
-          properties: { page: { margin: { top: 1080, right: 1080, bottom: 1080, left: 1080 } } },
-          children: [
-            new Paragraph({
-              alignment: AlignmentType.CENTER,
-              children: [
-                new ImageRun({
-                  type: "png",
-                  data: logoBuf,
-                  transformation: { width: 180, height: 180 },
-                }),
-              ],
-            }),
-            new Paragraph({
-              alignment: AlignmentType.CENTER,
-              spacing: { before: 200, after: 400 },
-              children: [new TextRun({ text: title, size: 56 })],
-            }),
-            table,
-            new Paragraph({
-              spacing: { before: 400, after: 120 },
-              children: [new TextRun({ text: `Semester: ${data.semester}`, bold: true, size: 28 })],
-            }),
-            info("Student Name", data.studentName),
-            ...(showId ? [info("Student ID", data.studentId)] : []),
-            info("Batch", `${data.batch}        Section: ${data.section}`),
-            info("Course Code", data.courseCode),
-            info("Course Name", data.courseName),
-            info(teacherLabel, data.teacherName),
-            info("Designation", data.designation),
-            info("Submission Date", data.submissionDate),
-          ],
-        },
-      ],
-    });
-
-    const blob = await Packer.toBlob(doc);
-    saveAs(blob, `${fileBase()}.docx`);
+  const pick = (t: CoverType) => {
+    coverStore.setSelected(t);
+    navigate({ to: "/form" });
   };
 
   return (
     <div className="min-h-screen pb-28 md:pb-12">
-      {loading && <LoadingOverlay />}
-
-      {/* Header */}
-      <header className="px-6 md:px-12 pt-10 pb-6">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div>
-            <p className="text-xs tracking-[0.3em] text-[#65A30D] font-semibold uppercase">
-              Daffodil International University
-            </p>
-            <h1 className="font-display text-4xl md:text-5xl font-bold text-[#166534] mt-1">
-              Cover Page Studio
-            </h1>
-          </div>
-          <div className="hidden md:flex gap-2 text-sm">
-            {TYPE_META.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setSelected(t.id)}
-                className={`px-4 py-2 rounded-full transition ${
-                  selected === t.id
-                    ? "bg-[#84CC16] text-white"
-                    : "bg-[#ECFCCB] text-[#166534] hover:bg-[#A3E635]"
-                }`}
-              >
-                {t.title}
-              </button>
-            ))}
-          </div>
+      <header className="px-4 sm:px-6 md:px-12 pt-8 sm:pt-10 pb-4 sm:pb-6">
+        <div className="max-w-6xl mx-auto text-center md:text-left">
+          <p className="text-[10px] sm:text-xs tracking-[0.3em] text-[#65A30D] font-semibold uppercase">
+            Daffodil International University
+          </p>
+          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-[#166534] mt-1">
+            Cover Page Studio
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-2 max-w-xl mx-auto md:mx-0">
+            Generate a print-ready DIU cover in seconds. Pick a type to begin.
+          </p>
         </div>
       </header>
 
-      {/* Type Selector */}
-      <section id="select" className="px-6 md:px-12">
+      <section className="px-4 sm:px-6 md:px-12 mt-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="font-display text-2xl text-[#166534] mb-5">
-            1 · Choose your cover page
+          <h2 className="font-display text-xl sm:text-2xl text-[#166534] mb-4 sm:mb-5">
+            Choose your cover page
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             {TYPE_META.map((t) => {
               const active = selected === t.id;
               return (
                 <button
                   key={t.id}
-                  onClick={() => setSelected(t.id)}
-                  className={`glass rounded-2xl p-6 text-left border-l-4 transition-all duration-300 ${
+                  onClick={() => pick(t.id)}
+                  className={`glass rounded-2xl p-5 sm:p-6 text-left border-l-4 transition-all duration-300 active:scale-[.98] ${
                     active
                       ? "lime-glow border-[#84CC16] -translate-y-1"
                       : "border-[#A3E635] hover:-translate-y-1"
                   }`}
                 >
-                  <div className="text-4xl mb-3">{t.icon}</div>
-                  <h3 className="font-display text-2xl text-[#166534]">{t.title}</h3>
-                  <p className="text-sm text-gray-600 mt-1">{t.desc}</p>
-                  <div className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-[#65A30D] bg-[#F7FEE7] px-3 py-1 rounded-full">
+                  <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">{t.icon}</div>
+                  <h3 className="font-display text-xl sm:text-2xl text-[#166534]">{t.title}</h3>
+                  <p className="text-xs sm:text-sm text-gray-600 mt-1">{t.desc}</p>
+                  <div className="mt-3 sm:mt-4 inline-flex items-center gap-2 text-xs font-semibold text-[#65A30D] bg-[#F7FEE7] px-3 py-1 rounded-full">
                     Total Mark · {t.total}
+                  </div>
+                  <div className="mt-4 text-xs font-semibold text-[#166534] flex items-center gap-1">
+                    Open form <span aria-hidden>→</span>
                   </div>
                 </button>
               );
@@ -402,119 +77,34 @@ ${showId ? `<div><b>Student ID:</b> ${data.studentId}</div>` : ""}
         </div>
       </section>
 
-      {/* Form */}
-      {selected && (
-        <section id="form" className="px-6 md:px-12 mt-12 slide-in-right">
-          <div className="max-w-4xl mx-auto glass rounded-3xl p-6 md:p-10">
-            <h2 className="font-display text-2xl text-[#166534] mb-6">
-              2 · Fill in your details
-            </h2>
-            <form onSubmit={handleGenerate} className="space-y-7">
-              {FIELD_GROUPS.map((g) => {
-                const fields =
-                  selected === "assignment"
-                    ? g.fields.filter((f) => f.key !== "studentId")
-                    : g.fields;
-                return (
-                  <div key={g.title}>
-                    <h3 className="text-xs uppercase tracking-widest text-[#65A30D] font-bold mb-3">
-                      {g.title}
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {fields.map((f) => (
-                        <div className="float-label" key={f.key}>
-                          <input
-                            id={f.key}
-                            placeholder=" "
-                            required
-                            value={form[f.key as keyof typeof form]}
-                            onChange={(e) => update(f.key, e.target.value)}
-                          />
-                          <label htmlFor={f.key}>{f.label}</label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-              <button
-                type="submit"
-                className="btn-lime w-full py-4 rounded-2xl font-display text-xl tracking-wide"
-              >
-                ✨ Generate Cover Page
-              </button>
-            </form>
-          </div>
-        </section>
-      )}
-
-      {/* Preview + Downloads */}
-      {generated && (
-        <section id="preview" className="px-6 md:px-12 mt-16">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="font-display text-2xl text-[#166534] mb-2">
-              3 · Your cover page
-            </h2>
-            <p className="text-sm text-gray-600 mb-6">
-              Total Mark configured: <strong>{TOTAL[generated.type]}</strong>
-            </p>
-
-            <div className="flex flex-wrap gap-3 mb-6" id="download">
-              {[
-                { label: "PDF", color: "#84CC16", fn: downloadPDF, icon: "📄" },
-                { label: "PNG", color: "#A3E635", fn: () => downloadImage("png"), icon: "🖼️" },
-                { label: "JPG", color: "#65A30D", fn: () => downloadImage("jpg"), icon: "📸" },
-                { label: "DOC", color: "#166534", fn: downloadDoc, icon: "📝" },
-                { label: "DOCX", color: "#4d7c0f", fn: downloadDocx, icon: "💾" },
-              ].map((b) => (
-                <button
-                  key={b.label}
-                  onClick={b.fn}
-                  className="px-5 py-2.5 rounded-full text-white font-semibold text-sm flex items-center gap-2 transition hover:scale-105 shadow-md"
-                  style={{ background: b.color }}
-                >
-                  <span>{b.icon}</span> {b.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="overflow-x-auto bg-[#F7FEE7] rounded-2xl p-4 md:p-8 border border-[#A3E635]/40">
-              <div ref={previewRef} className="a4-wrap mx-auto" style={{ width: 794 }}>
-                <CoverPage data={generated} />
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Mobile bottom nav */}
-      <nav className="md:hidden fixed bottom-3 left-3 right-3 z-[9999] glass rounded-2xl px-2 py-2 flex justify-around">
-        {[
-          { id: "home", icon: "🏠", label: "Home", target: "select" },
-          { id: "lab-report", icon: "🧪", label: "Lab", target: "select", type: "lab-report" as CoverType },
-          { id: "assignment", icon: "📘", label: "Assign", target: "select", type: "assignment" as CoverType },
-          { id: "lab-final", icon: "🎓", label: "Final", target: "select", type: "lab-final" as CoverType },
-          { id: "download", icon: "⬇️", label: "Save", target: "download" },
-        ].map((t) => {
-          const active = activeTab === t.id;
-          return (
-            <button
-              key={t.id}
-              onClick={() => {
-                setActiveTab(t.id);
-                if (t.type) setSelected(t.type);
-                document.getElementById(t.target)?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className={`flex flex-col items-center px-3 py-1.5 rounded-xl transition ${
-                active ? "bg-[#84CC16] text-white" : "text-[#166534]"
-              }`}
-            >
-              <span className="text-lg leading-none">{t.icon}</span>
-              <span className="text-[10px] mt-0.5 font-semibold">{t.label}</span>
-            </button>
-          );
-        })}
-      </nav>
+      <MobileNav current="home" />
     </div>
+  );
+}
+
+export function MobileNav({ current }: { current: "home" | "form" | "preview" }) {
+  const items: { id: "home" | "form" | "preview"; icon: string; label: string; to: "/" | "/form" | "/preview" }[] = [
+    { id: "home", icon: "🏠", label: "Home", to: "/" },
+    { id: "form", icon: "📝", label: "Form", to: "/form" },
+    { id: "preview", icon: "👁️", label: "View", to: "/preview" },
+  ];
+  return (
+    <nav className="md:hidden fixed bottom-3 left-3 right-3 z-[9999] glass rounded-2xl px-2 py-2 flex justify-around">
+      {items.map((t) => {
+        const active = current === t.id;
+        return (
+          <Link
+            key={t.id}
+            to={t.to}
+            className={`flex flex-col items-center px-4 py-1.5 rounded-xl transition ${
+              active ? "bg-[#84CC16] text-white" : "text-[#166534]"
+            }`}
+          >
+            <span className="text-lg leading-none">{t.icon}</span>
+            <span className="text-[10px] mt-0.5 font-semibold">{t.label}</span>
+          </Link>
+        );
+      })}
+    </nav>
   );
 }
