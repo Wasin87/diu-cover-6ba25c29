@@ -38,15 +38,61 @@ async function saveBlob(blob: Blob, filename: string) {
   }, 100);
 }
 
-// Render a single .doc-page DOM element to a canvas data URL
-async function renderElToImage(el: HTMLElement): Promise<string> {
+// Render a DOM element to canvas at full A4 size, bypassing any CSS transforms
+// applied to ancestors (e.g. .a4-wrap scale on mobile).
+async function renderElToCanvas(el: HTMLElement): Promise<HTMLCanvasElement> {
   const html2canvas = (await import("html2canvas")).default;
-  const canvas = await html2canvas(el, {
-    scale: 2,
-    useCORS: true,
-    backgroundColor: "#ffffff",
-    logging: false,
-  });
+
+  // Create an off-screen sandbox at exact A4 pixel size — no transforms.
+  const sandbox = document.createElement("div");
+  sandbox.style.position = "fixed";
+  sandbox.style.left = "-10000px";
+  sandbox.style.top = "0";
+  sandbox.style.width = "794px";
+  sandbox.style.minHeight = "1123px";
+  sandbox.style.background = "#ffffff";
+  sandbox.style.zIndex = "-1";
+  sandbox.style.pointerEvents = "none";
+
+  const clone = el.cloneNode(true) as HTMLElement;
+  // Remove transforms / margins that came from .a4-wrap scaling
+  clone.style.transform = "none";
+  clone.style.margin = "0";
+  sandbox.appendChild(clone);
+  document.body.appendChild(sandbox);
+
+  // Wait for images inside the clone to load (logo, attachments)
+  const imgs = Array.from(clone.querySelectorAll("img"));
+  await Promise.all(
+    imgs.map(
+      (img) =>
+        new Promise<void>((resolve) => {
+          if (img.complete && img.naturalWidth > 0) return resolve();
+          img.onload = () => resolve();
+          img.onerror = () => resolve();
+        }),
+    ),
+  );
+
+  try {
+    const canvas = await html2canvas(clone, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+      logging: false,
+      width: 794,
+      height: Math.max(1123, clone.scrollHeight),
+      windowWidth: 794,
+      windowHeight: Math.max(1123, clone.scrollHeight),
+    });
+    return canvas;
+  } finally {
+    document.body.removeChild(sandbox);
+  }
+}
+
+async function renderElToImage(el: HTMLElement): Promise<string> {
+  const canvas = await renderElToCanvas(el);
   return canvas.toDataURL("image/jpeg", 0.95);
 }
 
@@ -65,15 +111,9 @@ export async function downloadImage(
   data: CoverData,
   format: "png" | "jpg",
 ) {
-  const html2canvas = (await import("html2canvas")).default;
   const el = document.getElementById("cover-page");
   if (!el) throw new Error("Cover page not found");
-  const canvas = await html2canvas(el, {
-    scale: 2,
-    useCORS: true,
-    backgroundColor: "#ffffff",
-    logging: false,
-  });
+  const canvas = await renderElToCanvas(el);
   const mime = format === "png" ? "image/png" : "image/jpeg";
   const blob: Blob = await new Promise((resolve, reject) =>
     canvas.toBlob(
