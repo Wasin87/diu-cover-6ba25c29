@@ -1,6 +1,11 @@
 import { TOTAL, type CoverData } from "@/components/CoverPage";
 import diuLogo from "@/assets/diu-logo.png";
 
+type GeneratedData = CoverData & {
+  extraText: string;
+  images: { id: string; dataUrl: string; name: string }[];
+};
+
 export const fileBase = (data: CoverData) =>
   `${data.type}-${(data.studentName || "student").replace(/\s+/g, "_")}`;
 
@@ -11,14 +16,13 @@ async function saveBlob(blob: Blob, filename: string) {
     canShare?: (d: { files: File[] }) => boolean;
     share?: (d: { files: File[]; title?: string }) => Promise<void>;
   };
-  // Use share sheet on mobile when possible (saves to Gallery/Files)
   const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   if (isMobile && nav.canShare && nav.canShare({ files: [file] }) && nav.share) {
     try {
       await nav.share({ files: [file], title: filename });
       return;
     } catch {
-      // user cancelled or failed -> fall back to download
+      // user cancelled or failed -> fall back
     }
   }
   const url = URL.createObjectURL(blob);
@@ -34,41 +38,52 @@ async function saveBlob(blob: Blob, filename: string) {
   }, 100);
 }
 
-export async function downloadPDF(data: CoverData) {
-  const html2pdf = (await import("html2pdf.js")).default;
-  const el = document.getElementById("cover-page");
-  if (!el) throw new Error("Cover not ready");
-  const blob: Blob = await html2pdf()
-    .set({
-      margin: 0,
-      filename: `${fileBase(data)}.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff" },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-    })
-    .from(el)
-    .outputPdf("blob");
-  await saveBlob(blob, `${fileBase(data)}.pdf`);
-}
-
-export async function downloadImage(data: CoverData, type: "png" | "jpg") {
+// Render a single .doc-page DOM element to a canvas data URL
+async function renderElToImage(el: HTMLElement): Promise<string> {
   const html2canvas = (await import("html2canvas")).default;
-  const el = document.getElementById("cover-page");
-  if (!el) throw new Error("Cover not ready");
   const canvas = await html2canvas(el, {
     scale: 2,
     useCORS: true,
     backgroundColor: "#ffffff",
+    logging: false,
   });
-  const mime = type === "png" ? "image/png" : "image/jpeg";
-  const blob: Blob = await new Promise((resolve, reject) =>
-    canvas.toBlob(
-      (b) => (b ? resolve(b) : reject(new Error("Encode failed"))),
-      mime,
-      0.95,
-    ),
+  return canvas.toDataURL("image/jpeg", 0.95);
+}
+
+// Get image natural size from a data URL
+function imageSize(src: string): Promise<{ w: number; h: number }> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+export async function downloadPDF(data: GeneratedData, textPages: string[]) {
+  const { jsPDF } = await import("jspdf");
+  const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+  const pageW = pdf.internal.pageSize.getWidth(); // 210
+  const pageH = pdf.internal.pageSize.getHeight(); // 297
+
+  // Collect every .doc-page in DOM order (cover + images + text)
+  const nodes = Array.from(
+    document.querySelectorAll<HTMLElement>(".doc-page"),
   );
-  await saveBlob(blob, `${fileBase(data)}.${type}`);
+  if (!nodes.length) throw new Error("Nothing to export");
+
+  for (let i = 0; i < nodes.length; i++) {
+    const img = await renderElToImage(nodes[i]);
+    if (i > 0) pdf.addPage();
+    pdf.addImage(img, "JPEG", 0, 0, pageW, pageH, undefined, "FAST");
+  }
+
+  // Touch unused values to avoid lint warnings (these are intentionally unused)
+  void data;
+  void textPages;
+
+  const blob = pdf.output("blob");
+  await saveBlob(blob, `${fileBase(data)}.pdf`);
 }
 
 let logoB64Cache: string | null = null;
@@ -99,56 +114,47 @@ const criteriaOf = (t: CoverData["type"]): [string, number][] =>
       ? [["Content Quality", 2], ["Clarity", 1], ["Spelling & Grammar", 1], ["Organization and Formatting", 1]]
       : [["Understanding", 10], ["Analysis", 15], ["Implementation", 10], ["Report Writing", 5]];
 
-export async function downloadDoc(data: CoverData) {
-  const logo = await getLogoBase64();
-  const total = TOTAL[data.type];
-  const teacherLabel = data.type === "lab-final" ? "Teacher Name" : "Course Teacher Name";
-  const showId = data.type !== "assignment";
-  const rowsHtml = criteriaOf(data.type)
-    .map(
-      ([label, mark]) =>
-        `<tr><td style="border:1px solid #000;padding:6px;font-weight:bold;">${label}</td><td style="border:1px solid #000;padding:6px;text-align:center;font-weight:bold;">${mark}</td><td style="border:1px solid #000;padding:6px;">&nbsp;</td><td style="border:1px solid #000;padding:6px;">&nbsp;</td><td style="border:1px solid #000;padding:6px;">&nbsp;</td><td style="border:1px solid #000;padding:6px;">&nbsp;</td></tr>`,
-    )
-    .join("");
-  const html = `<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>Cover</title><!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]--><style>@page{size:A4;margin:1in;}body{font-family:'Times New Roman',serif;color:#000;}table{border-collapse:collapse;width:100%;}td{border:1px solid #000;padding:6px;}</style></head><body>
-<div style="text-align:center;margin-bottom:18px;"><img src="${logo}" style="height:140px;" alt="DIU"/></div>
-<h1 style="text-align:center;font-size:32pt;font-weight:normal;margin:10px 0 24px;">${titleOf(data.type)}</h1>
-<table><tbody>
-<tr><td colspan="6" style="text-align:center;font-weight:bold;">Only for course Teacher</td></tr>
-<tr style="font-weight:bold;text-align:center;"><td>&nbsp;</td><td>Needs Improvement</td><td>Developing</td><td>Sufficient</td><td>Above Average</td><td>Total Mark</td></tr>
-<tr style="text-align:center;font-weight:bold;"><td>Allocate mark &amp; Percentage</td><td>25%</td><td>50%</td><td>75%</td><td>100%</td><td>${total}</td></tr>
-${rowsHtml}
-<tr><td colspan="5" style="text-align:right;font-weight:bold;">Total obtained mark</td><td>&nbsp;</td></tr>
-<tr><td style="font-weight:bold;height:70px;">Comments</td><td colspan="5">&nbsp;</td></tr>
-</tbody></table>
-<div style="margin-top:30px;font-size:14pt;line-height:2;">
-<div style="font-weight:bold;font-size:16pt;">Semester: ${data.semester}</div>
-<div><b>Student Name:</b> ${data.studentName}</div>
-${showId ? `<div><b>Student ID:</b> ${data.studentId}</div>` : ""}
-<div><b>Batch:</b> ${data.batch} &nbsp;&nbsp;&nbsp;&nbsp;<b>Section:</b> ${data.section}</div>
-<div><b>Course Code:</b> ${data.courseCode}</div>
-<div><b>Course Name:</b> ${data.courseName}</div>
-<div><b>${teacherLabel}:</b> ${data.teacherName}</div>
-<div><b>Designation:</b> ${data.designation}</div>
-<div><b>Submission Date:</b> ${data.submissionDate}</div>
-</div></body></html>`;
-  const blob = new Blob(["\ufeff", html], { type: "application/msword" });
-  await saveBlob(blob, `${fileBase(data)}.doc`);
+function dataUrlToUint8(dataUrl: string): Uint8Array {
+  const base64 = dataUrl.split(",")[1] || "";
+  const bin = atob(base64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return arr;
 }
 
-export async function downloadDocx(data: CoverData) {
+function imageMime(dataUrl: string): "png" | "jpg" | "gif" | "bmp" {
+  if (dataUrl.startsWith("data:image/png")) return "png";
+  if (dataUrl.startsWith("data:image/gif")) return "gif";
+  if (dataUrl.startsWith("data:image/bmp")) return "bmp";
+  return "jpg";
+}
+
+export async function downloadDocx(data: GeneratedData, textPages: string[]) {
   const docxMod = await import("docx");
   const {
-    Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, ImageRun,
-    AlignmentType, WidthType, BorderStyle, HeightRule,
+    Document,
+    Packer,
+    Paragraph,
+    TextRun,
+    Table,
+    TableRow,
+    TableCell,
+    ImageRun,
+    AlignmentType,
+    WidthType,
+    BorderStyle,
+    HeightRule,
+    PageBreak,
+    HeadingLevel,
   } = docxMod;
 
   const total = TOTAL[data.type];
   const teacherLabel = data.type === "lab-final" ? "Teacher Name" : "Course Teacher Name";
   const showId = data.type !== "assignment";
 
-  const logoRes = await fetch(diuLogo);
-  const logoBuf = new Uint8Array(await logoRes.arrayBuffer());
+  // Logo
+  const logoDataUrl = await getLogoBase64();
+  const logoBuf = dataUrlToUint8(logoDataUrl);
 
   const border = { style: BorderStyle.SINGLE, size: 6, color: "000000" };
   const borders = { top: border, bottom: border, left: border, right: border };
@@ -174,8 +180,9 @@ export async function downloadDocx(data: CoverData) {
       ...(opts.height ? { height: { value: opts.height, rule: HeightRule.ATLEAST } } : {}),
     });
 
-  const table = new Table({
-    width: { size: 100, type: WidthType.PERCENTAGE },
+  const gradingTable = new Table({
+    width: { size: 9026, type: WidthType.DXA },
+    columnWidths: [2200, 1500, 1300, 1300, 1500, 1226],
     rows: [
       new TableRow({ children: [cell("Only for course Teacher", { bold: true, align: "center", cs: 6 })] }),
       new TableRow({
@@ -220,46 +227,136 @@ export async function downloadDocx(data: CoverData) {
   const info = (label: string, value: string) =>
     new Paragraph({
       spacing: { after: 120 },
-      children: [new TextRun({ text: `${label}: `, bold: true }), new TextRun(value)],
+      children: [
+        new TextRun({ text: `${label}: `, bold: true, size: 26 }),
+        new TextRun({ text: value, size: 26 }),
+      ],
     });
 
+  const coverChildren = [
+    new Paragraph({
+      alignment: AlignmentType.CENTER,
+      children: [
+        new ImageRun({
+          type: "png",
+          data: logoBuf,
+          transformation: { width: 180, height: 180 },
+        }),
+      ],
+    }),
+    new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { before: 200, after: 400 },
+      children: [new TextRun({ text: titleOf(data.type), size: 56 })],
+    }),
+    gradingTable,
+    new Paragraph({
+      spacing: { before: 400, after: 120 },
+      children: [new TextRun({ text: `Semester: ${data.semester}`, bold: true, size: 28 })],
+    }),
+    info("Student Name", data.studentName),
+    ...(showId ? [info("Student ID", data.studentId)] : []),
+    info("Batch", `${data.batch}        Section: ${data.section}`),
+    info("Course Code", data.courseCode),
+    info("Course Name", data.courseName),
+    info(teacherLabel, data.teacherName),
+    info("Designation", data.designation),
+    info("Submission Date", data.submissionDate),
+  ];
+
+  // Image pages — one per image, each preceded by page break
+  const imageChildren: InstanceType<typeof Paragraph>[] = [];
+  for (let i = 0; i < data.images.length; i++) {
+    const img = data.images[i];
+    const { w, h } = await imageSize(img.dataUrl);
+    // Fit into ~480x650 px area while preserving aspect
+    const maxW = 480;
+    const maxH = 650;
+    const ratio = Math.min(maxW / w, maxH / h, 1);
+    const dispW = Math.max(80, Math.round(w * ratio));
+    const dispH = Math.max(80, Math.round(h * ratio));
+
+    imageChildren.push(
+      new Paragraph({
+        children: [new PageBreak()],
+      }),
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        spacing: { before: 200, after: 200 },
+        children: [
+          new ImageRun({
+            type: imageMime(img.dataUrl),
+            data: dataUrlToUint8(img.dataUrl),
+            transformation: { width: dispW, height: dispH },
+          }),
+        ],
+      }),
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        children: [
+          new TextRun({ text: `Figure ${i + 1}`, italics: true, size: 22 }),
+        ],
+      }),
+    );
+  }
+
+  // Text pages
+  const textChildren: InstanceType<typeof Paragraph>[] = [];
+  for (let p = 0; p < textPages.length; p++) {
+    textChildren.push(new Paragraph({ children: [new PageBreak()] }));
+    const paragraphs = textPages[p].split(/\n{2,}/);
+    for (const para of paragraphs) {
+      const lines = para.split("\n");
+      textChildren.push(
+        new Paragraph({
+          alignment: AlignmentType.JUSTIFIED,
+          spacing: { after: 200, line: 360 },
+          children: lines.flatMap((line, idx) => {
+            const runs: InstanceType<typeof TextRun>[] = [
+              new TextRun({ text: line, size: 24 }),
+            ];
+            if (idx < lines.length - 1) {
+              runs.push(new TextRun({ text: "", break: 1 }));
+            }
+            return runs;
+          }),
+        }),
+      );
+    }
+  }
+
   const doc = new Document({
+    styles: {
+      default: {
+        document: { run: { font: "Times New Roman", size: 24 } },
+      },
+      paragraphStyles: [
+        {
+          id: "Heading1",
+          name: "Heading 1",
+          basedOn: "Normal",
+          next: "Normal",
+          quickFormat: true,
+          run: { size: 32, bold: true, font: "Times New Roman" },
+          paragraph: { spacing: { before: 240, after: 240 }, outlineLevel: 0 },
+        },
+      ],
+    },
     sections: [
       {
-        properties: { page: { margin: { top: 1080, right: 1080, bottom: 1080, left: 1080 } } },
-        children: [
-          new Paragraph({
-            alignment: AlignmentType.CENTER,
-            children: [
-              new ImageRun({
-                type: "png",
-                data: logoBuf,
-                transformation: { width: 180, height: 180 },
-              }),
-            ],
-          }),
-          new Paragraph({
-            alignment: AlignmentType.CENTER,
-            spacing: { before: 200, after: 400 },
-            children: [new TextRun({ text: titleOf(data.type), size: 56 })],
-          }),
-          table,
-          new Paragraph({
-            spacing: { before: 400, after: 120 },
-            children: [new TextRun({ text: `Semester: ${data.semester}`, bold: true, size: 28 })],
-          }),
-          info("Student Name", data.studentName),
-          ...(showId ? [info("Student ID", data.studentId)] : []),
-          info("Batch", `${data.batch}        Section: ${data.section}`),
-          info("Course Code", data.courseCode),
-          info("Course Name", data.courseName),
-          info(teacherLabel, data.teacherName),
-          info("Designation", data.designation),
-          info("Submission Date", data.submissionDate),
-        ],
+        properties: {
+          page: {
+            size: { width: 11906, height: 16838 },
+            margin: { top: 1080, right: 1080, bottom: 1080, left: 1080 },
+          },
+        },
+        children: [...coverChildren, ...imageChildren, ...textChildren],
       },
     ],
   });
+
+  // Suppress unused warning
+  void HeadingLevel;
 
   const blob = await Packer.toBlob(doc);
   await saveBlob(blob, `${fileBase(data)}.docx`);

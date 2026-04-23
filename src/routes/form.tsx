@@ -50,9 +50,18 @@ const TYPE_TITLE = {
   "lab-final": "Lab Final",
 } as const;
 
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result as string);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
 function FormPage() {
   const navigate = useNavigate();
-  const { selected, form, generated } = useCoverStore();
+  const { selected, form, generated, extraText, images } = useCoverStore();
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(!!generated);
 
@@ -62,17 +71,44 @@ function FormPage() {
 
   if (!selected) return null;
 
+  const handleImages = async (files: FileList | null) => {
+    if (!files || !files.length) return;
+    const accepted = Array.from(files).filter((f) => f.type.startsWith("image/"));
+    if (!accepted.length) {
+      toast.error("Please select image files only.");
+      return;
+    }
+    try {
+      const imgs = await Promise.all(
+        accepted.map(async (f) => ({
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+          dataUrl: await readFileAsDataUrl(f),
+          name: f.name,
+        })),
+      );
+      coverStore.addImages(imgs);
+      toast.success(`${imgs.length} image${imgs.length > 1 ? "s" : ""} added`);
+    } catch {
+      toast.error("Failed to read one or more images.");
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
-      coverStore.setGenerated({ ...form, type: selected });
+      coverStore.setGenerated({
+        ...form,
+        type: selected,
+        extraText,
+        images,
+      });
       setLoading(false);
       setDone(true);
       toast.success("Cover page generated!", {
         description: "Tap “View Cover Page” to preview & download.",
       });
-    }, 2000);
+    }, 1500);
   };
 
   return (
@@ -140,6 +176,90 @@ function FormPage() {
                 </div>
               );
             })}
+
+            {/* Extra content */}
+            <div>
+              <h3 className="text-[10px] sm:text-xs uppercase tracking-widest text-[#65A30D] font-bold mb-3">
+                Additional Content (Optional)
+              </h3>
+
+              <div className="float-label mb-4">
+                <textarea
+                  id="extraText"
+                  placeholder=" "
+                  rows={8}
+                  value={extraText}
+                  onChange={(e) => coverStore.setExtraText(e.target.value)}
+                  style={{ minHeight: 180, resize: "vertical" }}
+                />
+                <label htmlFor="extraText">Long Text (added as pages after the cover)</label>
+              </div>
+
+              <div className="rounded-2xl border-2 border-dashed border-[#A3E635] bg-[#F7FEE7]/60 p-4 sm:p-5">
+                <label
+                  htmlFor="imageUpload"
+                  className="flex flex-col items-center justify-center cursor-pointer text-center py-4"
+                >
+                  <span className="text-3xl mb-2">🖼️</span>
+                  <span className="font-semibold text-[#166534] text-sm sm:text-base">
+                    Upload images
+                  </span>
+                  <span className="text-xs text-gray-600 mt-1">
+                    Click to add multiple images. Each image becomes a new page.
+                  </span>
+                  <input
+                    id="imageUpload"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => {
+                      handleImages(e.target.files);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+
+                {images.length > 0 && (
+                  <div className="mt-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-semibold text-[#65A30D]">
+                        {images.length} image{images.length > 1 ? "s" : ""} added
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => coverStore.clearImages()}
+                        className="text-xs text-red-600 hover:underline"
+                      >
+                        Clear all
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                      {images.map((img) => (
+                        <div
+                          key={img.id}
+                          className="relative aspect-square rounded-lg overflow-hidden border border-[#A3E635]/50 bg-white group"
+                        >
+                          <img
+                            src={img.dataUrl}
+                            alt={img.name}
+                            className="w-full h-full object-cover"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => coverStore.removeImage(img.id)}
+                            className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white text-xs flex items-center justify-center opacity-80 hover:opacity-100"
+                            aria-label="Remove"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
 
             <button
               type="submit"

@@ -1,10 +1,14 @@
 import { useSyncExternalStore } from "react";
 import type { CoverData, CoverType } from "@/components/CoverPage";
 
+export type ExtraImage = { id: string; dataUrl: string; name: string };
+
 type State = {
   selected: CoverType | null;
   form: Omit<CoverData, "type">;
-  generated: CoverData | null;
+  extraText: string;
+  images: ExtraImage[];
+  generated: (CoverData & { extraText: string; images: ExtraImage[] }) | null;
 };
 
 const emptyForm: Omit<CoverData, "type"> = {
@@ -20,7 +24,13 @@ const emptyForm: Omit<CoverData, "type"> = {
   submissionDate: "",
 };
 
-let state: State = { selected: null, form: emptyForm, generated: null };
+let state: State = {
+  selected: null,
+  form: emptyForm,
+  extraText: "",
+  images: [],
+  generated: null,
+};
 const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((l) => l());
 
@@ -38,7 +48,23 @@ export const coverStore = {
     state = { ...state, form: { ...state.form, [k]: v } };
     emit();
   },
-  setGenerated(g: CoverData | null) {
+  setExtraText(t: string) {
+    state = { ...state, extraText: t };
+    emit();
+  },
+  addImages(imgs: ExtraImage[]) {
+    state = { ...state, images: [...state.images, ...imgs] };
+    emit();
+  },
+  removeImage(id: string) {
+    state = { ...state, images: state.images.filter((i) => i.id !== id) };
+    emit();
+  },
+  clearImages() {
+    state = { ...state, images: [] };
+    emit();
+  },
+  setGenerated(g: State["generated"]) {
     state = { ...state, generated: g };
     emit();
   },
