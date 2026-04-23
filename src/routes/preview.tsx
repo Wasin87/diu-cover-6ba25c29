@@ -9,7 +9,7 @@ import {
   TOTAL,
   splitTextIntoPages,
 } from "@/components/CoverPage";
-import { downloadPDF, downloadDocx } from "@/lib/downloads";
+import { downloadPDF, downloadDocx, downloadImage } from "@/lib/downloads";
 import { MobileNav } from "./index";
 
 export const Route = createFileRoute("/preview")({
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/preview")({
   component: PreviewPage,
 });
 
-type Fmt = "PDF" | "DOCX";
+type Fmt = "PDF" | "DOCX" | "PNG" | "JPG";
 
 function PreviewPage() {
   const { generated } = useCoverStore();
@@ -61,7 +61,8 @@ function PreviewPage() {
     }
   };
 
-  const buttons: { label: Fmt; color: string; icon: string; fn: () => Promise<void> }[] = [
+  const hasExtras = generated.images.length > 0 || textPages.length > 0;
+  const buttons: { label: Fmt; color: string; icon: string; fn: () => Promise<void>; disabled?: boolean; tip?: string }[] = [
     {
       label: "PDF",
       color: "#84CC16",
@@ -73,6 +74,22 @@ function PreviewPage() {
       color: "#166534",
       icon: "💾",
       fn: () => downloadDocx(generated, textPages),
+    },
+    {
+      label: "PNG",
+      color: "#65A30D",
+      icon: "🖼️",
+      fn: () => downloadImage(generated, "png"),
+      disabled: hasExtras,
+      tip: "PNG/JPG exports the cover page only. Remove extra text/images to enable.",
+    },
+    {
+      label: "JPG",
+      color: "#4D7C0F",
+      icon: "📸",
+      fn: () => downloadImage(generated, "jpg"),
+      disabled: hasExtras,
+      tip: "PNG/JPG exports the cover page only. Remove extra text/images to enable.",
     },
   ];
 
@@ -108,13 +125,14 @@ function PreviewPage() {
 
           {/* Download toolbar */}
           <div className="sticky top-2 z-30 bg-white/80 backdrop-blur-md rounded-2xl p-3 mb-5 border border-[#A3E635]/40 shadow-sm">
-            <div className="flex flex-wrap gap-2 sm:gap-3 justify-center sm:justify-start">
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3 sm:justify-start">
               {buttons.map((b) => (
                 <button
                   key={b.label}
                   onClick={() => run(b.label, b.fn)}
-                  disabled={busy !== null}
-                  className="px-5 sm:px-6 py-2.5 rounded-full text-white font-semibold text-xs sm:text-sm flex items-center gap-2 transition active:scale-95 hover:scale-105 shadow-md disabled:opacity-60 disabled:cursor-not-allowed min-w-[110px] justify-center"
+                  disabled={busy !== null || b.disabled}
+                  title={b.disabled ? b.tip : `Download ${b.label}`}
+                  className="px-4 sm:px-6 py-2.5 rounded-full text-white font-semibold text-xs sm:text-sm flex items-center gap-2 transition active:scale-95 hover:scale-105 shadow-md disabled:opacity-50 disabled:cursor-not-allowed justify-center"
                   style={{ background: b.color }}
                 >
                   {busy === b.label ? (
@@ -122,10 +140,15 @@ function PreviewPage() {
                   ) : (
                     <span>{b.icon}</span>
                   )}
-                  Download {b.label}
+                  <span className="whitespace-nowrap">Download {b.label}</span>
                 </button>
               ))}
             </div>
+            {hasExtras && (
+              <p className="mt-2 text-[11px] sm:text-xs text-gray-500 text-center sm:text-left">
+                PNG &amp; JPG export the cover page only. Use PDF or DOCX for full document with images and text.
+              </p>
+            )}
           </div>
 
           {/* A4 preview - all pages */}
