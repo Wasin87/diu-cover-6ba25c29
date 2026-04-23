@@ -1,27 +1,28 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useCoverStore } from "@/lib/cover-store";
-import { CoverPage, TOTAL } from "@/components/CoverPage";
 import {
-  downloadPDF,
-  downloadImage,
-  downloadDoc,
-  downloadDocx,
-} from "@/lib/downloads";
+  CoverPage,
+  ImagePage,
+  TextPage,
+  TOTAL,
+  splitTextIntoPages,
+} from "@/components/CoverPage";
+import { downloadPDF, downloadDocx } from "@/lib/downloads";
 import { MobileNav } from "./index";
 
 export const Route = createFileRoute("/preview")({
   head: () => ({
     meta: [
       { title: "Preview & Download — DIU Cover Page Studio" },
-      { name: "description", content: "Preview your generated DIU cover page and download it as PDF, PNG, JPG, DOC, or DOCX." },
+      { name: "description", content: "Preview your generated DIU cover page and download it as PDF or DOCX." },
     ],
   }),
   component: PreviewPage,
 });
 
-type Fmt = "PDF" | "PNG" | "JPG" | "DOC" | "DOCX";
+type Fmt = "PDF" | "DOCX";
 
 function PreviewPage() {
   const { generated } = useCoverStore();
@@ -31,6 +32,11 @@ function PreviewPage() {
   useEffect(() => {
     if (!generated) navigate({ to: "/form" });
   }, [generated, navigate]);
+
+  const textPages = useMemo(
+    () => (generated ? splitTextIntoPages(generated.extraText) : []),
+    [generated],
+  );
 
   if (!generated) return null;
 
@@ -56,11 +62,18 @@ function PreviewPage() {
   };
 
   const buttons: { label: Fmt; color: string; icon: string; fn: () => Promise<void> }[] = [
-    { label: "PDF", color: "#84CC16", icon: "📄", fn: () => downloadPDF(generated) },
-    { label: "PNG", color: "#A3E635", icon: "🖼️", fn: () => downloadImage(generated, "png") },
-    { label: "JPG", color: "#65A30D", icon: "📸", fn: () => downloadImage(generated, "jpg") },
-    { label: "DOC", color: "#166534", icon: "📝", fn: () => downloadDoc(generated) },
-    { label: "DOCX", color: "#4d7c0f", icon: "💾", fn: () => downloadDocx(generated) },
+    {
+      label: "PDF",
+      color: "#84CC16",
+      icon: "📄",
+      fn: () => downloadPDF(generated, textPages),
+    },
+    {
+      label: "DOCX",
+      color: "#166534",
+      icon: "💾",
+      fn: () => downloadDocx(generated, textPages),
+    },
   ];
 
   return (
@@ -85,10 +98,12 @@ function PreviewPage() {
       <section className="px-4 sm:px-6 md:px-12 mt-4 sm:mt-6">
         <div className="max-w-6xl mx-auto">
           <h2 className="font-display text-2xl sm:text-3xl text-[#166534] mb-1">
-            Your cover page
+            Your document
           </h2>
           <p className="text-xs sm:text-sm text-gray-600 mb-5 sm:mb-6">
-            Total mark: <strong>{TOTAL[generated.type]}</strong> · Pick a format below to download.
+            Total mark: <strong>{TOTAL[generated.type]}</strong> · Pages:{" "}
+            <strong>{1 + generated.images.length + textPages.length}</strong>{" "}
+            (1 cover + {generated.images.length} image{generated.images.length === 1 ? "" : "s"} + {textPages.length} text)
           </p>
 
           {/* Download toolbar */}
@@ -99,7 +114,7 @@ function PreviewPage() {
                   key={b.label}
                   onClick={() => run(b.label, b.fn)}
                   disabled={busy !== null}
-                  className="px-4 sm:px-5 py-2.5 rounded-full text-white font-semibold text-xs sm:text-sm flex items-center gap-2 transition active:scale-95 hover:scale-105 shadow-md disabled:opacity-60 disabled:cursor-not-allowed min-w-[88px] justify-center"
+                  className="px-5 sm:px-6 py-2.5 rounded-full text-white font-semibold text-xs sm:text-sm flex items-center gap-2 transition active:scale-95 hover:scale-105 shadow-md disabled:opacity-60 disabled:cursor-not-allowed min-w-[110px] justify-center"
                   style={{ background: b.color }}
                 >
                   {busy === b.label ? (
@@ -107,16 +122,31 @@ function PreviewPage() {
                   ) : (
                     <span>{b.icon}</span>
                   )}
-                  {b.label}
+                  Download {b.label}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* A4 preview */}
+          {/* A4 preview - all pages */}
           <div className="overflow-x-auto bg-[#F7FEE7] rounded-2xl p-3 sm:p-6 md:p-8 border border-[#A3E635]/40">
-            <div className="a4-wrap mx-auto" style={{ width: 794 }}>
+            <div className="a4-wrap mx-auto flex flex-col items-center gap-6" style={{ width: 794 }}>
               <CoverPage data={generated} />
+              {generated.images.map((img, i) => (
+                <ImagePage
+                  key={img.id}
+                  src={img.dataUrl}
+                  index={i}
+                  pageNumber={i + 2}
+                />
+              ))}
+              {textPages.map((t, i) => (
+                <TextPage
+                  key={`text-${i}`}
+                  content={t}
+                  pageNumber={generated.images.length + i + 2}
+                />
+              ))}
             </div>
           </div>
         </div>

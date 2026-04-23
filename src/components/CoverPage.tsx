@@ -16,6 +16,8 @@ export interface CoverData {
   submissionDate: string;
 }
 
+export type ExtraImage = { id: string; dataUrl: string; name: string };
+
 const TITLES: Record<CoverType, string> = {
   "lab-report": "Lab Report",
   assignment: "Course Assignment Report",
@@ -48,6 +50,48 @@ export const TOTAL: Record<CoverType, number> = {
   "lab-final": 40,
 };
 
+// Page sizing (matches A4 at 96dpi-ish)
+const PAGE_W = 794;
+const PAGE_H = 1123;
+// Body capacity (px) inside a text page after padding
+const TEXT_PAGE_PADDING_TOP = 90;
+const TEXT_PAGE_PADDING_BOTTOM = 80;
+const TEXT_PAGE_PADDING_X = 80;
+const TEXT_BODY_HEIGHT = PAGE_H - TEXT_PAGE_PADDING_TOP - TEXT_PAGE_PADDING_BOTTOM;
+// approximate chars per page (15px font, ~1.7 line height, ~70 chars wide, ~32 lines)
+const CHARS_PER_PAGE = 2200;
+
+export function splitTextIntoPages(text: string): string[] {
+  if (!text || !text.trim()) return [];
+  // Split by paragraphs first, accumulate
+  const paragraphs = text.split(/\n{2,}/);
+  const pages: string[] = [];
+  let buf = "";
+  const push = () => {
+    if (buf.trim()) pages.push(buf.trim());
+    buf = "";
+  };
+  for (const p of paragraphs) {
+    // If a single paragraph is huge, hard-split
+    let remaining = p;
+    while (remaining.length > CHARS_PER_PAGE) {
+      const slice = remaining.slice(0, CHARS_PER_PAGE);
+      // try to break at last space
+      const cut = slice.lastIndexOf(" ");
+      const safe = cut > CHARS_PER_PAGE * 0.7 ? cut : slice.length;
+      if (buf) push();
+      pages.push(remaining.slice(0, safe).trim());
+      remaining = remaining.slice(safe).trim();
+    }
+    if (buf.length + remaining.length + 2 > CHARS_PER_PAGE) {
+      push();
+    }
+    buf += (buf ? "\n\n" : "") + remaining;
+  }
+  push();
+  return pages;
+}
+
 export function CoverPage({ data }: { data: CoverData }) {
   const criteria = CRITERIA[data.type];
   const total = TOTAL[data.type];
@@ -56,7 +100,7 @@ export function CoverPage({ data }: { data: CoverData }) {
   const showStudentId = data.type !== "assignment";
 
   return (
-    <div id="cover-page" className="a4-page">
+    <div id="cover-page" className="a4-page doc-page">
       <div style={{ textAlign: "center", marginBottom: 18 }}>
         <img
           src={diuLogo}
@@ -154,6 +198,81 @@ export function CoverPage({ data }: { data: CoverData }) {
         <div>
           <strong>Submission Date:</strong> {data.submissionDate}
         </div>
+      </div>
+    </div>
+  );
+}
+
+export function ImagePage({
+  src,
+  index,
+  pageNumber,
+}: {
+  src: string;
+  index: number;
+  pageNumber: number;
+}) {
+  return (
+    <div
+      id={`doc-page-${pageNumber}`}
+      className="a4-page doc-page"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 40,
+      }}
+    >
+      <img
+        src={src}
+        alt={`Attachment ${index + 1}`}
+        crossOrigin="anonymous"
+        style={{
+          maxWidth: "100%",
+          maxHeight: PAGE_H - 120,
+          objectFit: "contain",
+          display: "block",
+        }}
+      />
+      <div
+        style={{
+          marginTop: 16,
+          fontSize: 12,
+          color: "#444",
+          fontFamily: "'Times New Roman', serif",
+        }}
+      >
+        Figure {index + 1}
+      </div>
+    </div>
+  );
+}
+
+export function TextPage({
+  content,
+  pageNumber,
+}: {
+  content: string;
+  pageNumber: number;
+}) {
+  return (
+    <div
+      id={`doc-page-${pageNumber}`}
+      className="a4-page doc-page"
+      style={{
+        padding: `${TEXT_PAGE_PADDING_TOP}px ${TEXT_PAGE_PADDING_X}px ${TEXT_PAGE_PADDING_BOTTOM}px`,
+        fontFamily: "'Times New Roman', serif",
+        fontSize: 15,
+        lineHeight: 1.8,
+        textAlign: "justify",
+        whiteSpace: "pre-wrap",
+        wordBreak: "break-word",
+        color: "#000",
+      }}
+    >
+      <div style={{ maxHeight: TEXT_BODY_HEIGHT, overflow: "hidden" }}>
+        {content}
       </div>
     </div>
   );
