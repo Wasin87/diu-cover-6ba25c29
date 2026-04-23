@@ -77,8 +77,52 @@ function HomePage() {
         </div>
       </section>
 
+      <SiteFooter />
       <MobileNav current="home" />
     </div>
+  );
+}
+
+function SiteFooter() {
+  return (
+    <footer className="mt-16 px-4 sm:px-6 md:px-12 pb-24 md:pb-10">
+      <div className="max-w-6xl mx-auto rounded-2xl bg-gradient-to-r from-[#166534] to-[#65A30D] text-white p-6 sm:p-8 shadow-lg">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-center sm:text-left">
+            <p className="font-display text-lg sm:text-xl font-semibold">
+              Developed by Md Wasin Ahmed
+            </p>
+            <p className="text-xs sm:text-sm text-white/80 mt-1">
+              © {new Date().getFullYear()} DIU Cover Page Studio. All rights reserved.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <a
+              href="https://www.facebook.com/wasin.ahmed.79/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook profile of Md Wasin Ahmed"
+              className="w-11 h-11 rounded-full bg-white/15 hover:bg-white hover:text-[#1877F2] text-white flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/>
+              </svg>
+            </a>
+            <a
+              href="https://www.linkedin.com/in/md-wasin-ahmed/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn profile of Md Wasin Ahmed"
+              className="w-11 h-11 rounded-full bg-white/15 hover:bg-white hover:text-[#0A66C2] text-white flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14zM8.34 18.34v-7.9H5.67v7.9h2.67zM7.01 9.27a1.55 1.55 0 1 0 0-3.1 1.55 1.55 0 0 0 0 3.1zm11.32 9.07v-4.33c0-2.4-1.28-3.52-2.99-3.52-1.38 0-2 .76-2.34 1.29v-1.11h-2.67c.04.75 0 7.9 0 7.9h2.67v-4.41c0-.24.02-.48.09-.65.19-.48.63-.98 1.37-.98.97 0 1.36.74 1.36 1.82v4.22h2.51z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
   );
 }
 
