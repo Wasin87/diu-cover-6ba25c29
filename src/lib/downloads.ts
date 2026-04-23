@@ -60,6 +60,31 @@ function imageSize(src: string): Promise<{ w: number; h: number }> {
   });
 }
 
+// Download cover page as PNG or JPG (single image of the cover page only)
+export async function downloadImage(
+  data: CoverData,
+  format: "png" | "jpg",
+) {
+  const html2canvas = (await import("html2canvas")).default;
+  const el = document.getElementById("cover-page");
+  if (!el) throw new Error("Cover page not found");
+  const canvas = await html2canvas(el, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: "#ffffff",
+    logging: false,
+  });
+  const mime = format === "png" ? "image/png" : "image/jpeg";
+  const blob: Blob = await new Promise((resolve, reject) =>
+    canvas.toBlob(
+      (b) => (b ? resolve(b) : reject(new Error("Image encoding failed"))),
+      mime,
+      0.95,
+    ),
+  );
+  await saveBlob(blob, `${fileBase(data)}.${format}`);
+}
+
 export async function downloadPDF(data: GeneratedData, textPages: string[]) {
   const { jsPDF } = await import("jspdf");
   const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
