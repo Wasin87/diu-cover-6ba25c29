@@ -84,14 +84,52 @@ function HomePage() {
   );
 }
 
+function SocialIcon({
+  href,
+  label,
+  brand,
+  children,
+}: {
+  href: string;
+  label: string;
+  brand: string;
+  children: React.ReactNode;
+}) {
+  const open = (e: React.MouseEvent) => {
+    // Force open in top window so iframe sandboxes (preview, embeds) don't block it
+    e.preventDefault();
+    try {
+      window.open(href, "_blank", "noopener,noreferrer");
+    } catch {
+      window.location.href = href;
+    }
+  };
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={label}
+      onClick={open}
+      onAuxClick={open}
+      style={{ ["--brand" as never]: brand }}
+      className="social-icon group relative w-11 h-11 rounded-full bg-white/15 text-white flex items-center justify-center transition-all hover:scale-110 active:scale-95 hover:bg-white hover:text-[var(--brand)] hover:shadow-[0_8px_24px_-6px_var(--brand)]"
+    >
+      <span className="absolute inset-0 rounded-full ring-2 ring-white/0 group-hover:ring-white/40 transition" />
+      {children}
+    </a>
+  );
+}
+
 function SiteFooter() {
   return (
     <footer className="mt-16 px-4 sm:px-6 md:px-12 pb-24 md:pb-10">
-      <div className="max-w-6xl mx-auto rounded-2xl bg-gradient-to-r from-[#166534] to-[#65A30D] text-white p-6 sm:p-8 shadow-lg">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="footer-card relative overflow-hidden max-w-6xl mx-auto rounded-3xl bg-gradient-to-r from-[#166534] via-[#3f6212] to-[#65A30D] text-white p-6 sm:p-8 shadow-[0_20px_60px_-20px_rgba(22,101,52,0.6)]">
+        <span className="footer-shine" aria-hidden />
+        <div className="relative flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-center sm:text-left">
-            <p className="font-display text-lg sm:text-xl font-semibold">
-              Developed by Md Wasin Ahmed
+            <p className="font-display text-lg sm:text-xl font-semibold tracking-wide">
+              Developed by <span className="underline decoration-[#A3E635] decoration-2 underline-offset-4">Md Wasin Ahmed</span>
             </p>
             <p className="text-xs sm:text-sm text-white/80 mt-1">
               © {new Date().getFullYear()} DIU Cover Page Studio. All rights reserved.
