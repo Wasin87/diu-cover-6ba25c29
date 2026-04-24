@@ -128,10 +128,10 @@ function SiteFooter() {
         <span className="footer-shine" aria-hidden />
         <div className="relative flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-center sm:text-left">
-            <p className="font-display text-lg sm:text-xl font-semibold tracking-wide">
+            <p className="font-display text-sm sm:text-xl font-semibold tracking-wide whitespace-nowrap">
               Developed by <span className="underline decoration-[#A3E635] decoration-2 underline-offset-4">Md Wasin Ahmed</span>
             </p>
-            <p className="text-xs sm:text-sm text-white/80 mt-1">
+            <p className="text-[10px] sm:text-sm text-white/80 mt-1">
               © {new Date().getFullYear()} DIU Cover Page Studio. All rights reserved.
             </p>
           </div>
