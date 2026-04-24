@@ -49,26 +49,27 @@ function HomePage() {
             Choose your cover page
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-            {TYPE_META.map((t) => {
+            {TYPE_META.map((t, i) => {
               const active = selected === t.id;
               return (
                 <button
                   key={t.id}
                   onClick={() => pick(t.id)}
-                  className={`glass rounded-2xl p-5 sm:p-6 text-left border-l-4 transition-all duration-300 active:scale-[.98] ${
-                    active
-                      ? "lime-glow border-[#84CC16] -translate-y-1"
-                      : "border-[#A3E635] hover:-translate-y-1"
+                  style={{ animationDelay: `${i * 90}ms` }}
+                  className={`card-deep pop-in rounded-2xl p-5 sm:p-6 text-left active:scale-[.98] ${
+                    active ? "is-active lime-glow" : ""
                   }`}
                 >
-                  <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">{t.icon}</div>
-                  <h3 className="font-display text-xl sm:text-2xl text-[#166534]">{t.title}</h3>
-                  <p className="text-xs sm:text-sm text-gray-600 mt-1">{t.desc}</p>
-                  <div className="mt-3 sm:mt-4 inline-flex items-center gap-2 text-xs font-semibold text-[#65A30D] bg-[#F7FEE7] px-3 py-1 rounded-full">
+                  <div className={`text-3xl sm:text-4xl mb-2 sm:mb-3 soft-float inline-block ${active ? "" : ""}`}>{t.icon}</div>
+                  <h3 className={`font-display text-xl sm:text-2xl ${active ? "text-white" : "text-[#166534]"}`}>{t.title}</h3>
+                  <p className={`text-xs sm:text-sm mt-1 ${active ? "text-white/90" : "text-[#3f6212]"}`}>{t.desc}</p>
+                  <div className={`mt-3 sm:mt-4 inline-flex items-center gap-2 text-xs font-semibold px-3 py-1 rounded-full ${
+                    active ? "bg-white/20 text-white" : "bg-white/70 text-[#65A30D] border border-[#A3E635]"
+                  }`}>
                     Total Mark · {t.total}
                   </div>
-                  <div className="mt-4 text-xs font-semibold text-[#166534] flex items-center gap-1">
-                    Open form <span aria-hidden>→</span>
+                  <div className={`mt-4 text-xs font-semibold flex items-center gap-1 ${active ? "text-white" : "text-[#166534]"}`}>
+                    Open form <span aria-hidden className="transition-transform group-hover:translate-x-1">→</span>
                   </div>
                 </button>
               );
