@@ -38,6 +38,56 @@ body {
   box-shadow: 0 10px 40px -10px rgba(101,163,13,0.18);
 }
 
+/* Deep, vibrant card backgrounds for cover-type cards */
+.card-deep {
+  position: relative;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(132,204,22,0.35), transparent 55%),
+    radial-gradient(circle at 0% 100%, rgba(22,101,52,0.30), transparent 55%),
+    linear-gradient(135deg, #ECFCCB 0%, #D9F99D 45%, #BEF264 100%);
+  border: 1px solid rgba(101,163,13,0.45);
+  box-shadow:
+    0 10px 30px -12px rgba(22,101,52,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.55);
+  overflow: hidden;
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, border-color .35s ease;
+}
+.card-deep::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.45) 50%, transparent 70%);
+  transform: translateX(-110%);
+  transition: transform .8s ease;
+  pointer-events: none;
+}
+.card-deep:hover::before { transform: translateX(110%); }
+.card-deep:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 22px 50px -18px rgba(22,101,52,0.55);
+  border-color: #65A30D;
+}
+.card-deep.is-active {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(132,204,22,0.55), transparent 55%),
+    linear-gradient(135deg, #BEF264 0%, #84CC16 60%, #65A30D 100%);
+  color: white;
+  border-color: #166534;
+}
+
+/* Gentle entrance for grid items */
+@keyframes pop-in {
+  0% { opacity: 0; transform: translateY(14px) scale(.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.pop-in { animation: pop-in .55s cubic-bezier(.2,.8,.2,1) both; }
+
+/* Soft floating badge */
+@keyframes soft-float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.soft-float { animation: soft-float 3.2s ease-in-out infinite; }
+
 .lime-glow {
   box-shadow: 0 0 0 2px #84CC16, 0 0 30px rgba(132,204,22,0.45);
 }
