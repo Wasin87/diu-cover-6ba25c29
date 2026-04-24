@@ -60,15 +60,15 @@ function HomePage() {
                     active ? "is-active lime-glow" : ""
                   }`}
                 >
-                  <div className={`text-3xl sm:text-4xl mb-2 sm:mb-3 soft-float inline-block ${active ? "" : ""}`}>{t.icon}</div>
-                  <h3 className={`font-display text-xl sm:text-2xl ${active ? "text-white" : "text-[#166534]"}`}>{t.title}</h3>
-                  <p className={`text-xs sm:text-sm mt-1 ${active ? "text-white/90" : "text-[#3f6212]"}`}>{t.desc}</p>
+                  <div className="text-3xl sm:text-4xl mb-2 sm:mb-3 soft-float inline-block">{t.icon}</div>
+                  <h3 className={`font-display text-xl sm:text-2xl ${active ? "text-black" : "text-[#166534]"}`}>{t.title}</h3>
+                  <p className={`text-xs sm:text-sm mt-1 ${active ? "text-black/80" : "text-[#3f6212]"}`}>{t.desc}</p>
                   <div className={`mt-3 sm:mt-4 inline-flex items-center gap-2 text-xs font-semibold px-3 py-1 rounded-full ${
-                    active ? "bg-white/20 text-white" : "bg-white/70 text-[#65A30D] border border-[#A3E635]"
+                    active ? "bg-black/10 text-black border border-black/20" : "bg-white/70 text-[#65A30D] border border-[#A3E635]"
                   }`}>
                     Total Mark · {t.total}
                   </div>
-                  <div className={`mt-4 text-xs font-semibold flex items-center gap-1 ${active ? "text-white" : "text-[#166534]"}`}>
+                  <div className={`mt-4 text-xs font-semibold flex items-center gap-1 ${active ? "text-black" : "text-[#166534]"}`}>
                     Open form <span aria-hidden className="transition-transform group-hover:translate-x-1">→</span>
                   </div>
                 </button>
