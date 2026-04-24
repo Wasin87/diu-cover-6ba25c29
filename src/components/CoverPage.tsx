@@ -105,7 +105,7 @@ export function CoverPage({ data }: { data: CoverData }) {
         <img
           src={diuLogo}
           alt="Daffodil International University"
-          style={{ height: 200, margin: "0 auto", display: "block" }}
+          style={{ height: 235, margin: "0 auto", display: "block" }}
           crossOrigin="anonymous"
         />
       </div>
