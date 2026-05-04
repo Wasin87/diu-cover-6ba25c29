@@ -58,6 +58,16 @@ async function renderElToCanvas(el: HTMLElement): Promise<HTMLCanvasElement> {
   // Remove transforms / margins that came from .a4-wrap scaling
   clone.style.transform = "none";
   clone.style.margin = "0";
+  clone.style.width = "794px";
+  clone.style.minHeight = "1123px";
+  clone.style.maxWidth = "none";
+  clone.style.boxSizing = "border-box";
+  // Force tables to honor explicit widths so columns don't collapse on mobile
+  clone.querySelectorAll("table").forEach((t) => {
+    (t as HTMLTableElement).style.tableLayout = "fixed";
+    (t as HTMLTableElement).style.width = "100%";
+    (t as HTMLTableElement).style.wordBreak = "break-word";
+  });
   sandbox.appendChild(clone);
   document.body.appendChild(sandbox);
 
