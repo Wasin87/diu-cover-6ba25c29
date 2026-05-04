@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { coverStore, useCoverStore } from "@/lib/cover-store";
 import type { CoverType } from "@/components/CoverPage";
+import diuLogo from "@/assets/diu-logo.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
