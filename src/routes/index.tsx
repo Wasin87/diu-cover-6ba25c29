@@ -173,32 +173,50 @@ function SiteFooter() {
   );
 }
 
+import { Home as HomeIcon, FileText, Eye } from "lucide-react";
+
 export function MobileNav({ current }: { current: "home" | "form" | "preview" }) {
-  const items: { id: "home" | "form" | "preview"; icon: string; label: string; to: "/" | "/form" | "/preview" }[] = [
-    { id: "home", icon: "🏠", label: "Home", to: "/" },
-    { id: "form", icon: "📝", label: "Form", to: "/form" },
-    { id: "preview", icon: "👁️", label: "View", to: "/preview" },
+  const items: {
+    id: "home" | "form" | "preview";
+    Icon: typeof HomeIcon;
+    label: string;
+    to: "/" | "/form" | "/preview";
+  }[] = [
+    { id: "home", Icon: HomeIcon, label: "Home", to: "/" },
+    { id: "form", Icon: FileText, label: "Form", to: "/form" },
+    { id: "preview", Icon: Eye, label: "Preview", to: "/preview" },
   ];
   return (
     <nav
-      className="md:hidden fixed left-2 right-2 z-[9999] glass rounded-2xl px-1.5 py-1.5 flex justify-around items-center gap-1"
+      className="md:hidden fixed left-3 right-3 z-[9999] rounded-2xl bg-[#FBF9F2] border border-black/5 shadow-[0_8px_30px_-8px_rgba(0,0,0,0.18)] px-3 py-2 flex justify-around items-stretch"
       style={{
-        bottom: "calc(env(safe-area-inset-bottom, 0px) + 8px)",
-        maxWidth: "calc(100vw - 16px)",
+        bottom: "calc(env(safe-area-inset-bottom, 0px) + 10px)",
+        maxWidth: "calc(100vw - 24px)",
       }}
     >
       {items.map((t) => {
         const active = current === t.id;
+        const { Icon } = t;
         return (
           <Link
             key={t.id}
             to={t.to}
-            className={`flex-1 min-w-0 flex flex-col items-center justify-center px-2 py-1.5 rounded-xl transition ${
-              active ? "bg-[#84CC16] text-white" : "text-[#166534]"
-            }`}
+            className="flex-1 min-w-0 flex flex-col items-center justify-center gap-1 px-1 py-1"
           >
-            <span className="text-base leading-none">{t.icon}</span>
-            <span className="text-[10px] mt-0.5 font-semibold truncate">{t.label}</span>
+            <span
+              className={`flex items-center justify-center w-11 h-9 rounded-xl transition-all ${
+                active ? "bg-[#166534] text-white shadow-[0_4px_12px_-4px_rgba(22,101,52,0.55)]" : "text-[#1f2937]"
+              }`}
+            >
+              <Icon size={22} strokeWidth={active ? 2.4 : 2} />
+            </span>
+            <span
+              className={`text-[11px] font-semibold tracking-wide truncate ${
+                active ? "text-[#166534]" : "text-[#374151]"
+              }`}
+            >
+              {t.label}
+            </span>
           </Link>
         );
       })}
