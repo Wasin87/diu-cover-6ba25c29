@@ -85,15 +85,19 @@ async function renderElToCanvas(el: HTMLElement): Promise<HTMLCanvasElement> {
   );
 
   try {
+    const renderHeight = Math.max(1123, clone.scrollHeight);
     const canvas = await html2canvas(clone, {
       scale: 2,
       useCORS: true,
       backgroundColor: "#ffffff",
       logging: false,
       width: 794,
-      height: Math.max(1123, clone.scrollHeight),
-      windowWidth: 794,
-      windowHeight: Math.max(1123, clone.scrollHeight),
+      height: renderHeight,
+      // Use a wide windowWidth so responsive @media (max-width: …) rules
+      // (which scale .a4-wrap) do NOT activate during render — preventing
+      // any layout collapse / text-table overlap on mobile devices.
+      windowWidth: 1280,
+      windowHeight: Math.max(1123, renderHeight),
     });
     return canvas;
   } finally {
