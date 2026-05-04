@@ -168,19 +168,25 @@ export function MobileNav({ current }: { current: "home" | "form" | "preview" })
     { id: "preview", icon: "👁️", label: "View", to: "/preview" },
   ];
   return (
-    <nav className="md:hidden fixed bottom-3 left-3 right-3 z-[9999] glass rounded-2xl px-2 py-2 flex justify-around">
+    <nav
+      className="md:hidden fixed left-2 right-2 z-[9999] glass rounded-2xl px-1.5 py-1.5 flex justify-around items-center gap-1"
+      style={{
+        bottom: "calc(env(safe-area-inset-bottom, 0px) + 8px)",
+        maxWidth: "calc(100vw - 16px)",
+      }}
+    >
       {items.map((t) => {
         const active = current === t.id;
         return (
           <Link
             key={t.id}
             to={t.to}
-            className={`flex flex-col items-center px-4 py-1.5 rounded-xl transition ${
+            className={`flex-1 min-w-0 flex flex-col items-center justify-center px-2 py-1.5 rounded-xl transition ${
               active ? "bg-[#84CC16] text-white" : "text-[#166534]"
             }`}
           >
-            <span className="text-lg leading-none">{t.icon}</span>
-            <span className="text-[10px] mt-0.5 font-semibold">{t.label}</span>
+            <span className="text-base leading-none">{t.icon}</span>
+            <span className="text-[10px] mt-0.5 font-semibold truncate">{t.label}</span>
           </Link>
         );
       })}
