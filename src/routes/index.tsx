@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { coverStore, useCoverStore } from "@/lib/cover-store";
 import type { CoverType } from "@/components/CoverPage";
+import diuLogo from "@/assets/diu-logo.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -28,27 +29,38 @@ function HomePage() {
   };
 
   return (
-    <div className="min-h-screen pb-28 md:pb-12">
-      <header className="px-4 sm:px-6 md:px-12 pt-8 sm:pt-10 pb-4 sm:pb-6">
-        <div className="max-w-6xl mx-auto text-center md:text-left">
-          <p className="text-[10px] sm:text-xs tracking-[0.3em] text-[#65A30D] font-semibold uppercase">
+    <div className="min-h-screen pb-28 md:pb-12 relative overflow-hidden">
+      {/* Decorative blobs for unique vibe */}
+      <div aria-hidden className="pointer-events-none absolute -top-24 -left-24 w-72 h-72 rounded-full bg-[#BEF264]/40 blur-3xl" />
+      <div aria-hidden className="pointer-events-none absolute top-40 -right-24 w-80 h-80 rounded-full bg-[#65A30D]/20 blur-3xl" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 dot-grid opacity-40" />
+
+      <header className="relative px-4 sm:px-6 md:px-12 pt-6 sm:pt-10 pb-4 sm:pb-6">
+        <div className="max-w-6xl mx-auto flex flex-col items-center text-center">
+          <img
+            src={diuLogo}
+            alt="Daffodil International University logo"
+            className="h-14 sm:h-20 md:h-24 w-auto object-contain drop-shadow-md soft-float"
+          />
+          <p className="mt-2 text-[10px] sm:text-xs tracking-[0.3em] text-[#65A30D] font-semibold uppercase">
             Daffodil International University
           </p>
           <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-[#166534] mt-1">
             Cover Page Studio
           </h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-2 max-w-xl mx-auto md:mx-0">
+          <div className="mt-2 h-[3px] w-20 rounded-full bg-gradient-to-r from-[#A3E635] via-[#65A30D] to-[#166534]" />
+          <p className="text-sm sm:text-base text-gray-600 mt-3 max-w-xl">
             Generate a print-ready DIU cover in seconds. Pick a type to begin.
           </p>
         </div>
       </header>
 
-      <section className="px-4 sm:px-6 md:px-12 mt-4">
+      <section className="relative px-3 sm:px-6 md:px-12 mt-2 sm:mt-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="font-display text-xl sm:text-2xl text-[#166534] mb-4 sm:mb-5">
+          <h2 className="font-display text-lg sm:text-2xl text-[#166534] mb-3 sm:mb-5 text-center sm:text-left">
             Choose your cover page
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+          <div className="grid grid-cols-3 gap-2 sm:gap-5">
             {TYPE_META.map((t, i) => {
               const active = selected === t.id;
               return (
@@ -56,20 +68,20 @@ function HomePage() {
                   key={t.id}
                   onClick={() => pick(t.id)}
                   style={{ animationDelay: `${i * 90}ms` }}
-                  className={`card-deep pop-in rounded-2xl p-5 sm:p-6 text-left active:scale-[.98] ${
+                  className={`card-deep pop-in rounded-xl sm:rounded-2xl p-2.5 sm:p-6 text-left active:scale-[.98] flex flex-col ${
                     active ? "is-active lime-glow" : ""
                   }`}
                 >
-                  <div className="text-3xl sm:text-4xl mb-2 sm:mb-3 soft-float inline-block">{t.icon}</div>
-                  <h3 className={`font-display text-xl sm:text-2xl ${active ? "text-black" : "text-[#166534]"}`}>{t.title}</h3>
-                  <p className={`text-xs sm:text-sm mt-1 ${active ? "text-black/80" : "text-[#3f6212]"}`}>{t.desc}</p>
-                  <div className={`mt-3 sm:mt-4 inline-flex items-center gap-2 text-xs font-semibold px-3 py-1 rounded-full ${
+                  <div className="text-2xl sm:text-4xl mb-1 sm:mb-3 soft-float inline-block">{t.icon}</div>
+                  <h3 className={`font-display text-[13px] leading-tight sm:text-2xl ${active ? "text-black" : "text-[#166534]"}`}>{t.title}</h3>
+                  <p className={`hidden sm:block text-xs sm:text-sm mt-1 ${active ? "text-black/80" : "text-[#3f6212]"}`}>{t.desc}</p>
+                  <div className={`mt-2 sm:mt-4 inline-flex items-center gap-1 text-[9px] sm:text-xs font-semibold px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-full self-start ${
                     active ? "bg-black/10 text-black border border-black/20" : "bg-white/70 text-[#65A30D] border border-[#A3E635]"
                   }`}>
-                    Total Mark · {t.total}
+                    <span className="hidden sm:inline">Total Mark · </span>{t.total}
                   </div>
-                  <div className={`mt-4 text-xs font-semibold flex items-center gap-1 ${active ? "text-black" : "text-[#166534]"}`}>
-                    Open form <span aria-hidden className="transition-transform group-hover:translate-x-1">→</span>
+                  <div className={`hidden sm:flex mt-4 text-xs font-semibold items-center gap-1 ${active ? "text-black" : "text-[#166534]"}`}>
+                    Open form <span aria-hidden>→</span>
                   </div>
                 </button>
               );
