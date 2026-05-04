@@ -40,7 +40,7 @@ function HomePage() {
           <img
             src={diuLogo}
             alt="Daffodil International University logo"
-            className="h-14 sm:h-20 md:h-24 w-auto object-contain drop-shadow-md soft-float"
+            className="h-24 sm:h-32 md:h-40 w-auto object-contain drop-shadow-md soft-float"
           />
           <p className="mt-2 text-[10px] sm:text-xs tracking-[0.3em] text-[#65A30D] font-semibold uppercase">
             Daffodil International University
