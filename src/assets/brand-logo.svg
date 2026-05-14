@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 56" role="img" aria-label="Cover Studio">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#166534"/>
+      <stop offset="100%" stop-color="#65A30D"/>
+    </linearGradient>
+    <linearGradient id="page" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ECFCCB"/>
+      <stop offset="100%" stop-color="#A3E635"/>
+    </linearGradient>
+  </defs>
+  <g>
+    <rect x="2" y="4" width="48" height="48" rx="12" fill="url(#bg)"/>
+    <path d="M14 14 h18 l8 8 v18 a4 4 0 0 1 -4 4 H14 a4 4 0 0 1 -4 -4 V18 a4 4 0 0 1 4 -4 z" fill="url(#page)"/>
+    <path d="M32 14 v6 a2 2 0 0 0 2 2 h6" fill="none" stroke="#166534" stroke-width="1.6" stroke-linejoin="round"/>
+    <text x="22" y="40" font-family="'Playfair Display', serif" font-weight="900" font-size="20" fill="#166534">d</text>
+  </g>
+  <g font-family="'Playfair Display', serif" fill="currentColor">
+    <text x="62" y="28" font-size="20" font-weight="700" letter-spacing="0.5">Cover</text>
+    <text x="62" y="46" font-size="14" font-weight="400" letter-spacing="3" fill-opacity="0.7">STUDIO</text>
+  </g>
+</svg>
