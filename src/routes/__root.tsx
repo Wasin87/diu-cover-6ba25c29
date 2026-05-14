@@ -1,5 +1,6 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { Toaster } from "sonner";
+import { PWA } from "@/components/PWA";
 
 import appCss from "../styles.css?url";
 
@@ -42,12 +43,17 @@ export const Route = createRootRoute({
       { name: "twitter:description", content: "Generate beautiful Daffodil International University cover pages for Lab Reports, Assignments, and Lab Finals." },
       { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/be0b9729-8f20-4dff-8944-16ec09f52f6c" },
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/be0b9729-8f20-4dff-8944-16ec09f52f6c" },
+      { name: "theme-color", content: "#166534" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
+      { name: "apple-mobile-web-app-title", content: "Cover Studio" },
+      { name: "mobile-web-app-capable", content: "yes" },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      { rel: "apple-touch-icon", href: "/icon-192.png" },
     ],
   }),
   shellComponent: RootShell,
@@ -73,6 +79,7 @@ function RootComponent() {
   return (
     <>
       <Outlet />
+      <PWA />
       <Toaster
         position="top-center"
         richColors
