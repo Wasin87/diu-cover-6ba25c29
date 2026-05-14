@@ -36,6 +36,18 @@ function HomePage() {
       <div aria-hidden className="pointer-events-none absolute inset-0 dot-grid opacity-40" />
 
       <header className="relative px-4 sm:px-6 md:px-12 pt-6 sm:pt-10 pb-4 sm:pb-6">
+        <Link
+          to="/"
+          aria-label="DIU Cover home"
+          className="absolute top-3 left-3 sm:top-5 sm:left-6 md:top-6 md:left-10 inline-flex items-center gap-2 rounded-full bg-white/70 backdrop-blur-md border border-[#A3E635]/50 pl-1.5 pr-3 py-1 sm:pl-2 sm:pr-4 sm:py-1.5 shadow-[0_8px_24px_-12px_rgba(22,101,52,0.4)] hover:shadow-[0_10px_28px_-10px_rgba(22,101,52,0.55)] hover:scale-[1.03] active:scale-95 transition-all"
+        >
+          <span className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-[#166534] to-[#65A30D] shadow-inner">
+            <img src="/icon-192.png" alt="" className="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-contain" />
+          </span>
+          <span className="font-display text-sm sm:text-base font-bold text-[#166534] tracking-tight whitespace-nowrap">
+            DIU Cover
+          </span>
+        </Link>
         <div className="max-w-6xl mx-auto flex flex-col items-center text-center">
           <img
             src={diuLogo}
