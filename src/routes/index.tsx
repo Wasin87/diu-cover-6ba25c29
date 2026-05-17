@@ -8,6 +8,27 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "DIU Cover Page Studio — Choose Cover Type" },
       { name: "description", content: "Generate beautiful Daffodil International University cover pages for Lab Reports, Assignments, and Lab Finals." },
+      { property: "og:title", content: "DIU Cover Page Studio — Choose Cover Type" },
+      { property: "og:description", content: "Pick a cover type and generate a print-ready DIU cover in seconds." },
+      { property: "og:url", content: "https://uni-cover.lovable.app/" },
+    ],
+    links: [
+      { rel: "canonical", href: "https://uni-cover.lovable.app/" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: "DIU Cover Page Studio",
+          applicationCategory: "EducationalApplication",
+          operatingSystem: "Web",
+          url: "https://uni-cover.lovable.app/",
+          description: "Generate print-ready Daffodil International University cover pages for Lab Reports, Assignments, and Lab Finals.",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+        }),
+      },
     ],
   }),
   component: HomePage,
@@ -35,6 +56,7 @@ function HomePage() {
       <div aria-hidden className="pointer-events-none absolute top-40 -right-24 w-80 h-80 rounded-full bg-[#65A30D]/20 blur-3xl" />
       <div aria-hidden className="pointer-events-none absolute inset-0 dot-grid opacity-40" />
 
+      
       <header className="relative px-4 sm:px-6 md:px-12 pt-6 sm:pt-10 pb-4 sm:pb-6">
         <Link
           to="/"
@@ -58,7 +80,7 @@ function HomePage() {
             Daffodil International University
           </p>
           <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-[#166534] mt-1">
-            Cover Page Studio
+            DIU Cover Page Studio
           </h1>
           <div className="mt-2 h-[3px] w-20 rounded-full bg-gradient-to-r from-[#A3E635] via-[#65A30D] to-[#166534]" />
           <p className="text-sm sm:text-base text-gray-600 mt-3 max-w-xl">
@@ -101,6 +123,7 @@ function HomePage() {
           </div>
         </div>
       </section>
+      
 
       <SiteFooter />
       <MobileNav current="home" />

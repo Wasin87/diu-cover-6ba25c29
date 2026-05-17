@@ -11,6 +11,12 @@ export const Route = createFileRoute("/form")({
     meta: [
       { title: "Fill Cover Details — DIU Cover Page Studio" },
       { name: "description", content: "Enter your student and course information to generate the cover page." },
+      { property: "og:title", content: "Fill Cover Details — DIU Cover Page Studio" },
+      { property: "og:description", content: "Enter your student and course information to generate the cover page." },
+      { property: "og:url", content: "https://uni-cover.lovable.app/form" },
+    ],
+    links: [
+      { rel: "canonical", href: "https://uni-cover.lovable.app/form" },
     ],
   }),
   component: FormPage,
@@ -242,7 +248,7 @@ function FormPage() {
                         >
                           <img
                             src={img.dataUrl}
-                            alt={img.name}
+                            alt={`Attachment preview: ${img.name}`}
                             className="w-full h-full object-cover"
                           />
                           <button
