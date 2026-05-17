@@ -78,7 +78,9 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   return (
     <>
-      <Outlet />
+      <main>
+        <Outlet />
+      </main>
       <PWA />
       <Toaster
         position="top-center"
