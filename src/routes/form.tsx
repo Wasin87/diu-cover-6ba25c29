@@ -242,7 +242,7 @@ function FormPage() {
                         >
                           <img
                             src={img.dataUrl}
-                            alt={img.name}
+                            alt={`Attachment preview: ${img.name}`}
                             className="w-full h-full object-cover"
                           />
                           <button

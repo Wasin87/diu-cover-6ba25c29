@@ -1,0 +1,9 @@
+# DIU Cover Page Studio
+
+> Generate print-ready Daffodil International University cover pages for Lab Reports, Course Assignments, and Lab Finals. Fill a short form, preview an A4 layout, and download as PDF, DOCX, PNG, or JPG.
+
+## Pages
+
+- [Home](/): Choose the cover type (Lab Report, Assignment, Lab Final).
+- [Form](/form): Enter student, course, and submission details, plus optional extra text and images.
+- [Preview](/preview): Preview the generated cover and download as PDF, DOCX, PNG, or JPG.

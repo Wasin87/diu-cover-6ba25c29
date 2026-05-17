@@ -37,7 +37,7 @@ export function LoadingOverlay() {
         <div className="absolute inset-6 rounded-full bg-gradient-to-br from-[#F7FEE7] to-[#ECFCCB] shadow-[0_0_50px_rgba(132,204,22,0.45)] flex items-center justify-center">
           <img
             src={diuLogo}
-            alt="DIU"
+            alt="Daffodil International University logo"
             className="w-28 h-28 sm:w-32 sm:h-32 object-contain animate-pulse"
             style={{ animationDuration: "2.2s" }}
           />
