@@ -17,6 +17,12 @@ export const Route = createFileRoute("/preview")({
     meta: [
       { title: "Preview & Download — DIU Cover Page Studio" },
       { name: "description", content: "Preview your generated DIU cover page and download it as PDF or DOCX." },
+      { property: "og:title", content: "Preview & Download — DIU Cover Page Studio" },
+      { property: "og:description", content: "Preview your generated DIU cover page and download it as PDF, DOCX, PNG, or JPG." },
+      { property: "og:url", content: "https://uni-cover.lovable.app/preview" },
+    ],
+    links: [
+      { rel: "canonical", href: "https://uni-cover.lovable.app/preview" },
     ],
   }),
   component: PreviewPage,
