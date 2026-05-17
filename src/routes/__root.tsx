@@ -55,6 +55,18 @@ export const Route = createRootRoute({
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
       { rel: "apple-touch-icon", href: "/icon-192.png" },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "DIU Cover Page Studio",
+          url: "https://uni-cover.lovable.app/",
+          description: "Generate print-ready Daffodil International University cover pages for Lab Reports, Assignments, and Lab Finals.",
+        }),
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
