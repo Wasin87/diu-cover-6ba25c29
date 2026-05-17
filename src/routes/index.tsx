@@ -56,6 +56,7 @@ function HomePage() {
       <div aria-hidden className="pointer-events-none absolute top-40 -right-24 w-80 h-80 rounded-full bg-[#65A30D]/20 blur-3xl" />
       <div aria-hidden className="pointer-events-none absolute inset-0 dot-grid opacity-40" />
 
+      <main>
       <header className="relative px-4 sm:px-6 md:px-12 pt-6 sm:pt-10 pb-4 sm:pb-6">
         <Link
           to="/"
@@ -122,6 +123,7 @@ function HomePage() {
           </div>
         </div>
       </section>
+      </main>
 
       <SiteFooter />
       <MobileNav current="home" />
