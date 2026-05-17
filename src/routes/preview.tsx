@@ -120,9 +120,9 @@ function PreviewPage() {
 
       <section className="px-4 sm:px-6 md:px-12 mt-4 sm:mt-6">
         <div className="max-w-6xl mx-auto">
-          <h2 className="font-display text-2xl sm:text-3xl text-[#166534] mb-1">
+          <h1 className="font-display text-2xl sm:text-3xl text-[#166534] mb-1">
             Your document
-          </h2>
+          </h1>
           <p className="text-xs sm:text-sm text-gray-600 mb-5 sm:mb-6">
             Total mark: <strong>{TOTAL[generated.type]}</strong> · Pages:{" "}
             <strong>{1 + generated.images.length + textPages.length}</strong>{" "}
