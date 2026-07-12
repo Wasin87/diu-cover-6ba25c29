@@ -9,14 +9,14 @@ import { MobileNav } from "./index";
 export const Route = createFileRoute("/form")({
   head: () => ({
     meta: [
-      { title: "Fill Cover Details — DIU Cover Page Studio" },
+      { title: "Fill Cover Details — DIU Cover" },
       { name: "description", content: "Enter your student and course information to generate the cover page." },
-      { property: "og:title", content: "Fill Cover Details — DIU Cover Page Studio" },
+      { property: "og:title", content: "Fill Cover Details — DIU Cover" },
       { property: "og:description", content: "Enter your student and course information to generate the cover page." },
-      { property: "og:url", content: "https://uni-cover.lovable.app/form" },
+      { property: "og:url", content: "https://diu-cover.lovable.app/form" },
     ],
     links: [
-      { rel: "canonical", href: "https://uni-cover.lovable.app/form" },
+      { rel: "canonical", href: "https://diu-cover.lovable.app/form" },
     ],
   }),
   component: FormPage,
