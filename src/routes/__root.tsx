@@ -64,8 +64,8 @@ export const Route = createRootRoute({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebSite",
-          name: "DIU Cover Page Studio",
-          url: "https://uni-cover.lovable.app/",
+          name: "DIU Cover",
+          url: "https://diu-cover.lovable.app/",
           description: "Generate print-ready Daffodil International University cover pages for Lab Reports, Assignments, and Lab Finals.",
         }),
       },
