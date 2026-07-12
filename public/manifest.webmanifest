@@ -1,6 +1,6 @@
 {
-  "name": "DIU Cover Page Studio",
-  "short_name": "Cover Studio",
+  "name": "DIU Cover",
+  "short_name": "DIU Cover",
   "description": "Generate beautiful Daffodil International University cover pages for Lab Reports, Assignments, and Lab Finals.",
   "start_url": "/",
   "scope": "/",
