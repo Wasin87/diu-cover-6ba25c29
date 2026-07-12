@@ -1,7 +1,7 @@
 {
   "name": "DIU Cover",
   "short_name": "DIU Cover",
-  "description": "Generate beautiful Daffodil International University cover pages for Lab Reports, Assignments, and Lab Finals.",
+  "description": "Generate print-ready Daffodil International University cover pages for Lab Reports, Assignments, and Lab Finals.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

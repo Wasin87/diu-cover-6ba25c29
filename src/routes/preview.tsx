@@ -15,14 +15,14 @@ import { MobileNav } from "./index";
 export const Route = createFileRoute("/preview")({
   head: () => ({
     meta: [
-      { title: "Preview & Download — DIU Cover Page Studio" },
+      { title: "Preview & Download — DIU Cover" },
       { name: "description", content: "Preview your generated DIU cover page and download it as PDF or DOCX." },
-      { property: "og:title", content: "Preview & Download — DIU Cover Page Studio" },
+      { property: "og:title", content: "Preview & Download — DIU Cover" },
       { property: "og:description", content: "Preview your generated DIU cover page and download it as PDF, DOCX, PNG, or JPG." },
-      { property: "og:url", content: "https://uni-cover.lovable.app/preview" },
+      { property: "og:url", content: "https://diu-cover.lovable.app/preview" },
     ],
     links: [
-      { rel: "canonical", href: "https://uni-cover.lovable.app/preview" },
+      { rel: "canonical", href: "https://diu-cover.lovable.app/preview" },
     ],
   }),
   component: PreviewPage,

@@ -6,14 +6,14 @@ import diuLogo from "@/assets/diu-logo.png";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "DIU Cover Page Studio — Choose Cover Type" },
+      { title: "DIU Cover — Choose Cover Type" },
       { name: "description", content: "Generate beautiful Daffodil International University cover pages for Lab Reports, Assignments, and Lab Finals." },
-      { property: "og:title", content: "DIU Cover Page Studio — Choose Cover Type" },
+      { property: "og:title", content: "DIU Cover — Choose Cover Type" },
       { property: "og:description", content: "Pick a cover type and generate a print-ready DIU cover in seconds." },
-      { property: "og:url", content: "https://uni-cover.lovable.app/" },
+      { property: "og:url", content: "https://diu-cover.lovable.app/" },
     ],
     links: [
-      { rel: "canonical", href: "https://uni-cover.lovable.app/" },
+      { rel: "canonical", href: "https://diu-cover.lovable.app/" },
     ],
     scripts: [
       {
@@ -21,10 +21,10 @@ export const Route = createFileRoute("/")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "SoftwareApplication",
-          name: "DIU Cover Page Studio",
+          name: "DIU Cover",
           applicationCategory: "EducationalApplication",
           operatingSystem: "Web",
-          url: "https://uni-cover.lovable.app/",
+          url: "https://diu-cover.lovable.app/",
           description: "Generate print-ready Daffodil International University cover pages for Lab Reports, Assignments, and Lab Finals.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
@@ -80,7 +80,7 @@ function HomePage() {
             Daffodil International University
           </p>
           <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-[#166534] mt-1">
-            DIU Cover Page Studio
+            DIU Cover
           </h1>
           <div className="mt-2 h-[3px] w-20 rounded-full bg-gradient-to-r from-[#A3E635] via-[#65A30D] to-[#166534]" />
           <p className="text-sm sm:text-base text-gray-600 mt-3 max-w-xl">
@@ -179,7 +179,7 @@ function SiteFooter() {
               Developed by <span className="underline decoration-[#A3E635] decoration-2 underline-offset-4">Md Wasin Ahmed</span>
             </p>
             <p className="text-[10px] sm:text-sm text-white/80 mt-1">
-              © {new Date().getFullYear()} DIU Cover Page Studio. All rights reserved.
+              © {new Date().getFullYear()} DIU Cover. All rights reserved.
             </p>
           </div>
           <div className="flex items-center gap-3">
