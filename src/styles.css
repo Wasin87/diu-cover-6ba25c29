@@ -2,8 +2,6 @@
 @source "../src";
 @import "tw-animate-css";
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
-
 :root {
   --lime-50: #F7FEE7;
   --lime-100: #ECFCCB;
