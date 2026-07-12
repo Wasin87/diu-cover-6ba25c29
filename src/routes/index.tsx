@@ -80,7 +80,7 @@ function HomePage() {
             Daffodil International University
           </p>
           <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-[#166534] mt-1">
-            DIU Cover Page Studio
+            DIU Cover
           </h1>
           <div className="mt-2 h-[3px] w-20 rounded-full bg-gradient-to-r from-[#A3E635] via-[#65A30D] to-[#166534]" />
           <p className="text-sm sm:text-base text-gray-600 mt-3 max-w-xl">
