@@ -179,7 +179,7 @@ function SiteFooter() {
               Developed by <span className="underline decoration-[#A3E635] decoration-2 underline-offset-4">Md Wasin Ahmed</span>
             </p>
             <p className="text-[10px] sm:text-sm text-white/80 mt-1">
-              © {new Date().getFullYear()} DIU Cover Page Studio. All rights reserved.
+              © {new Date().getFullYear()} DIU Cover. All rights reserved.
             </p>
           </div>
           <div className="flex items-center gap-3">
