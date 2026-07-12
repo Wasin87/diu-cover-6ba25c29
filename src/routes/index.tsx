@@ -6,14 +6,14 @@ import diuLogo from "@/assets/diu-logo.png";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "DIU Cover Page Studio — Choose Cover Type" },
+      { title: "DIU Cover — Choose Cover Type" },
       { name: "description", content: "Generate beautiful Daffodil International University cover pages for Lab Reports, Assignments, and Lab Finals." },
-      { property: "og:title", content: "DIU Cover Page Studio — Choose Cover Type" },
+      { property: "og:title", content: "DIU Cover — Choose Cover Type" },
       { property: "og:description", content: "Pick a cover type and generate a print-ready DIU cover in seconds." },
-      { property: "og:url", content: "https://uni-cover.lovable.app/" },
+      { property: "og:url", content: "https://diu-cover.lovable.app/" },
     ],
     links: [
-      { rel: "canonical", href: "https://uni-cover.lovable.app/" },
+      { rel: "canonical", href: "https://diu-cover.lovable.app/" },
     ],
     scripts: [
       {
@@ -21,10 +21,10 @@ export const Route = createFileRoute("/")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "SoftwareApplication",
-          name: "DIU Cover Page Studio",
+          name: "DIU Cover",
           applicationCategory: "EducationalApplication",
           operatingSystem: "Web",
-          url: "https://uni-cover.lovable.app/",
+          url: "https://diu-cover.lovable.app/",
           description: "Generate print-ready Daffodil International University cover pages for Lab Reports, Assignments, and Lab Finals.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
