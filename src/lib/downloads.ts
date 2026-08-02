@@ -318,7 +318,7 @@ export async function downloadDocx(data: GeneratedData, textPages: string[]) {
     new Paragraph({
       alignment: AlignmentType.CENTER,
       spacing: { before: 200, after: 400 },
-      children: [new TextRun({ text: titleOf(data.type), size: 56 })],
+      children: [new TextRun({ text: titleOf(data), size: 56 })],
     }),
     gradingTable,
     new Paragraph({
