@@ -103,6 +103,7 @@ function FormPage() {
       coverStore.setGenerated({
         ...form,
         type: selected,
+        titleVariant: variants ? titleVariant || variants[0] : undefined,
         extraText,
         images,
       });
