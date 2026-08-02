@@ -150,6 +150,29 @@ function FormPage() {
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-7">
+            {variants && (
+              <div>
+                <h3 className="text-[10px] sm:text-xs uppercase tracking-widest text-[#65A30D] font-bold mb-3">
+                  Cover Page Title
+                </h3>
+                <select
+                  aria-label="Cover page title"
+                  value={titleVariant || variants[0]}
+                  onChange={(e) => coverStore.setTitleVariant(e.target.value)}
+                  className="w-full rounded-2xl border border-[#A3E635] bg-white px-4 py-3 text-sm sm:text-base font-semibold text-[#166534] outline-none focus:ring-2 focus:ring-[#65A30D]"
+                >
+                  {variants.map((v) => (
+                    <option key={v} value={v}>
+                      {v}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-2 text-xs text-gray-600">
+                  This title will be printed on the generated cover page.
+                </p>
+              </div>
+            )}
+
             {FIELD_GROUPS.map((g) => {
               const fields =
                 selected === "assignment"
