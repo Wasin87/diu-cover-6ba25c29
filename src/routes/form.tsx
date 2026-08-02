@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { coverStore, useCoverStore } from "@/lib/cover-store";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { TOTAL } from "@/components/CoverPage";
+import { TOTAL, TITLES, TITLE_VARIANTS } from "@/components/CoverPage";
 import { MobileNav } from "./index";
 
 export const Route = createFileRoute("/form")({
@@ -50,11 +50,7 @@ const FIELD_GROUPS = [
   },
 ] as const;
 
-const TYPE_TITLE = {
-  "lab-report": "Lab Report",
-  assignment: "Course Assignment",
-  "lab-final": "Lab Final",
-} as const;
+const TYPE_TITLE = TITLES;
 
 function readFileAsDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
