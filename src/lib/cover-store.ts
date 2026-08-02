@@ -5,13 +5,14 @@ export type ExtraImage = { id: string; dataUrl: string; name: string };
 
 type State = {
   selected: CoverType | null;
-  form: Omit<CoverData, "type">;
+  titleVariant: string;
+  form: Omit<CoverData, "type" | "titleVariant">;
   extraText: string;
   images: ExtraImage[];
   generated: (CoverData & { extraText: string; images: ExtraImage[] }) | null;
 };
 
-const emptyForm: Omit<CoverData, "type"> = {
+const emptyForm: Omit<CoverData, "type" | "titleVariant"> = {
   semester: "",
   studentName: "",
   studentId: "",
@@ -26,6 +27,7 @@ const emptyForm: Omit<CoverData, "type"> = {
 
 let state: State = {
   selected: null,
+  titleVariant: "",
   form: emptyForm,
   extraText: "",
   images: [],
