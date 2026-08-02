@@ -96,6 +96,8 @@ function FormPage() {
     }
   };
 
+  const variants = TITLE_VARIANTS[selected];
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
