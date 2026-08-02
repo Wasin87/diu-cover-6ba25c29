@@ -158,7 +158,7 @@ export function CoverPage({ data }: { data: CoverData }) {
           fontFamily: "'Times New Roman', serif",
         }}
       >
-        {TITLES[data.type]}
+        {resolveTitle(data)}
       </h1>
 
       <table className="a4-table">
