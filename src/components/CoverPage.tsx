@@ -1,9 +1,15 @@
 import diuLogo from "@/assets/diu-logo.png";
 
-export type CoverType = "lab-report" | "assignment" | "lab-final";
+export type CoverType =
+  | "lab-report"
+  | "assignment"
+  | "lab-final"
+  | "lab-project-assignment"
+  | "lab-performance";
 
 export interface CoverData {
   type: CoverType;
+  titleVariant?: string;
   semester: string;
   studentName: string;
   studentId: string;
@@ -18,13 +24,33 @@ export interface CoverData {
 
 export type ExtraImage = { id: string; dataUrl: string; name: string };
 
-const TITLES: Record<CoverType, string> = {
+export const TITLES: Record<CoverType, string> = {
   "lab-report": "Lab Report",
   assignment: "Course Assignment Report",
   "lab-final": "Lab Final",
+  "lab-project-assignment": "Lab/Project Assignment Report",
+  "lab-performance": "Lab Performance Report",
 };
 
-const CRITERIA: Record<CoverType, { label: string; mark: number }[]> = {
+// Title options selectable on the form for certain cover types
+export const TITLE_VARIANTS: Partial<Record<CoverType, string[]>> = {
+  "lab-report": ["Lab Report", "Project Report"],
+  "lab-final": ["Lab Final", "Project Final"],
+  "lab-project-assignment": [
+    "Lab/Project Assignment Report",
+    "Lab Assignment Report",
+    "Project Assignment Report",
+  ],
+};
+
+export const resolveTitle = (data: Pick<CoverData, "type" | "titleVariant">) => {
+  const options = TITLE_VARIANTS[data.type];
+  if (data.titleVariant && (!options || options.includes(data.titleVariant)))
+    return data.titleVariant;
+  return TITLES[data.type];
+};
+
+export const CRITERIA: Record<CoverType, { label: string; mark: number }[]> = {
   "lab-report": [
     { label: "Understanding/Analysis", mark: 7 },
     { label: "Implementation", mark: 8 },
@@ -42,13 +68,27 @@ const CRITERIA: Record<CoverType, { label: string; mark: number }[]> = {
     { label: "Implementation", mark: 10 },
     { label: "Report Writing", mark: 5 },
   ],
+  "lab-project-assignment": [
+    { label: "Creativity", mark: 1 },
+    { label: "Content Development", mark: 2 },
+    { label: "Problem solving", mark: 1 },
+    { label: "Organization and Formatting", mark: 1 },
+  ],
+  "lab-performance": [
+    { label: "Lab Work", mark: 10 },
+    { label: "Lab Assignment", mark: 10 },
+    { label: "Viva", mark: 5 },
+  ],
 };
 
 export const TOTAL: Record<CoverType, number> = {
   "lab-report": 25,
   assignment: 5,
   "lab-final": 40,
+  "lab-project-assignment": 5,
+  "lab-performance": 25,
 };
+
 
 // Page sizing (matches A4 at 96dpi-ish)
 const PAGE_W = 794;
