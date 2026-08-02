@@ -38,6 +38,8 @@ const TYPE_META: { id: CoverType; title: string; desc: string; total: number; ic
   { id: "lab-report", title: "Lab Report", desc: "Understanding • Implementation • Report", total: 25, icon: "🧪" },
   { id: "assignment", title: "Course Assignment", desc: "Content • Clarity • Grammar • Format", total: 5, icon: "📘" },
   { id: "lab-final", title: "Lab Final", desc: "Understanding • Analysis • Impl • Report", total: 40, icon: "🎓" },
+  { id: "lab-project-assignment", title: "Lab/Project Assignment Report", desc: "Creativity • Content • Problem solving • Format", total: 5, icon: "🧩" },
+  { id: "lab-performance", title: "Lab Performance Report", desc: "Lab Work • Lab Assignment • Viva", total: 25, icon: "⚙️" },
 ];
 
 function HomePage() {
