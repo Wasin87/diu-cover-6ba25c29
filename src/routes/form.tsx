@@ -63,7 +63,8 @@ function readFileAsDataUrl(file: File): Promise<string> {
 
 function FormPage() {
   const navigate = useNavigate();
-  const { selected, form, generated, extraText, images } = useCoverStore();
+  const { selected, titleVariant, form, generated, extraText, images } =
+    useCoverStore();
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(!!generated);
 
