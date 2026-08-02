@@ -39,14 +39,18 @@ const emit = () => listeners.forEach((l) => l());
 export const coverStore = {
   get: () => state,
   setSelected(t: CoverType | null) {
-    state = { ...state, selected: t };
+    state = { ...state, selected: t, titleVariant: "" };
     emit();
   },
-  setForm(f: Omit<CoverData, "type">) {
+  setTitleVariant(v: string) {
+    state = { ...state, titleVariant: v };
+    emit();
+  },
+  setForm(f: State["form"]) {
     state = { ...state, form: f };
     emit();
   },
-  updateField(k: keyof Omit<CoverData, "type">, v: string) {
+  updateField(k: keyof State["form"], v: string) {
     state = { ...state, form: { ...state.form, [k]: v } };
     emit();
   },
