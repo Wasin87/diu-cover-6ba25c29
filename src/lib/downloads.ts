@@ -1,4 +1,4 @@
-import { TOTAL, type CoverData } from "@/components/CoverPage";
+import { TOTAL, CRITERIA, resolveTitle, type CoverData } from "@/components/CoverPage";
 import diuLogo from "@/assets/diu-logo.png";
 
 type GeneratedData = CoverData & {
@@ -179,19 +179,11 @@ async function getLogoBase64(): Promise<string> {
   return logoB64Cache;
 }
 
-const titleOf = (t: CoverData["type"]) =>
-  t === "lab-report"
-    ? "Lab Report"
-    : t === "assignment"
-      ? "Course Assignment Report"
-      : "Lab Final";
+const titleOf = (data: CoverData) => resolveTitle(data);
 
 const criteriaOf = (t: CoverData["type"]): [string, number][] =>
-  t === "lab-report"
-    ? [["Understanding/Analysis", 7], ["Implementation", 8], ["Report Writing", 10]]
-    : t === "assignment"
-      ? [["Content Quality", 2], ["Clarity", 1], ["Spelling & Grammar", 1], ["Organization and Formatting", 1]]
-      : [["Understanding", 10], ["Analysis", 15], ["Implementation", 10], ["Report Writing", 5]];
+  CRITERIA[t].map((c) => [c.label, c.mark] as [string, number]);
+
 
 function dataUrlToUint8(dataUrl: string): Uint8Array {
   const base64 = dataUrl.split(",")[1] || "";
@@ -326,7 +318,7 @@ export async function downloadDocx(data: GeneratedData, textPages: string[]) {
     new Paragraph({
       alignment: AlignmentType.CENTER,
       spacing: { before: 200, after: 400 },
-      children: [new TextRun({ text: titleOf(data.type), size: 56 })],
+      children: [new TextRun({ text: titleOf(data), size: 56 })],
     }),
     gradingTable,
     new Paragraph({

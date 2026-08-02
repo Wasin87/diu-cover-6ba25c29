@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { coverStore, useCoverStore } from "@/lib/cover-store";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { TOTAL } from "@/components/CoverPage";
+import { TOTAL, TITLES, TITLE_VARIANTS } from "@/components/CoverPage";
 import { MobileNav } from "./index";
 
 export const Route = createFileRoute("/form")({
@@ -50,11 +50,7 @@ const FIELD_GROUPS = [
   },
 ] as const;
 
-const TYPE_TITLE = {
-  "lab-report": "Lab Report",
-  assignment: "Course Assignment",
-  "lab-final": "Lab Final",
-} as const;
+const TYPE_TITLE = TITLES;
 
 function readFileAsDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -67,7 +63,8 @@ function readFileAsDataUrl(file: File): Promise<string> {
 
 function FormPage() {
   const navigate = useNavigate();
-  const { selected, form, generated, extraText, images } = useCoverStore();
+  const { selected, titleVariant, form, generated, extraText, images } =
+    useCoverStore();
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(!!generated);
 
@@ -99,6 +96,8 @@ function FormPage() {
     }
   };
 
+  const variants = TITLE_VARIANTS[selected];
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -106,6 +105,7 @@ function FormPage() {
       coverStore.setGenerated({
         ...form,
         type: selected,
+        titleVariant: variants ? titleVariant || variants[0] : undefined,
         extraText,
         images,
       });
@@ -150,6 +150,29 @@ function FormPage() {
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-7">
+            {variants && (
+              <div>
+                <h3 className="text-[10px] sm:text-xs uppercase tracking-widest text-[#65A30D] font-bold mb-3">
+                  Cover Page Title
+                </h3>
+                <select
+                  aria-label="Cover page title"
+                  value={titleVariant || variants[0]}
+                  onChange={(e) => coverStore.setTitleVariant(e.target.value)}
+                  className="w-full rounded-2xl border border-[#A3E635] bg-white px-4 py-3 text-sm sm:text-base font-semibold text-[#166534] outline-none focus:ring-2 focus:ring-[#65A30D]"
+                >
+                  {variants.map((v) => (
+                    <option key={v} value={v}>
+                      {v}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-2 text-xs text-gray-600">
+                  This title will be printed on the generated cover page.
+                </p>
+              </div>
+            )}
+
             {FIELD_GROUPS.map((g) => {
               const fields =
                 selected === "assignment"

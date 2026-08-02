@@ -5,13 +5,14 @@ export type ExtraImage = { id: string; dataUrl: string; name: string };
 
 type State = {
   selected: CoverType | null;
-  form: Omit<CoverData, "type">;
+  titleVariant: string;
+  form: Omit<CoverData, "type" | "titleVariant">;
   extraText: string;
   images: ExtraImage[];
   generated: (CoverData & { extraText: string; images: ExtraImage[] }) | null;
 };
 
-const emptyForm: Omit<CoverData, "type"> = {
+const emptyForm: Omit<CoverData, "type" | "titleVariant"> = {
   semester: "",
   studentName: "",
   studentId: "",
@@ -26,6 +27,7 @@ const emptyForm: Omit<CoverData, "type"> = {
 
 let state: State = {
   selected: null,
+  titleVariant: "",
   form: emptyForm,
   extraText: "",
   images: [],
@@ -37,14 +39,18 @@ const emit = () => listeners.forEach((l) => l());
 export const coverStore = {
   get: () => state,
   setSelected(t: CoverType | null) {
-    state = { ...state, selected: t };
+    state = { ...state, selected: t, titleVariant: "" };
     emit();
   },
-  setForm(f: Omit<CoverData, "type">) {
+  setTitleVariant(v: string) {
+    state = { ...state, titleVariant: v };
+    emit();
+  },
+  setForm(f: State["form"]) {
     state = { ...state, form: f };
     emit();
   },
-  updateField(k: keyof Omit<CoverData, "type">, v: string) {
+  updateField(k: keyof State["form"], v: string) {
     state = { ...state, form: { ...state.form, [k]: v } };
     emit();
   },
