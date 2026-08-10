@@ -297,7 +297,7 @@ export async function downloadDocx(data: GeneratedData, textPages: string[]) {
 
   const info = (label: string, value: string) =>
     new Paragraph({
-      spacing: { after: 120 },
+      spacing: { after: 0, line: 360 },
       children: [
         new TextRun({ text: `${label}: `, bold: true, size: 26 }),
         new TextRun({ text: value, size: 26 }),
@@ -307,24 +307,26 @@ export async function downloadDocx(data: GeneratedData, textPages: string[]) {
   const coverChildren = [
     new Paragraph({
       alignment: AlignmentType.CENTER,
+      spacing: { before: 0, after: 0, line: 240 },
       children: [
         new ImageRun({
           type: "png",
           data: logoBuf,
-          transformation: { width: 180, height: 180 },
+          transformation: { width: 200, height: 200 },
         }),
       ],
     }),
     new Paragraph({
       alignment: AlignmentType.CENTER,
-      spacing: { before: 200, after: 400 },
+      spacing: { before: 0, after: 120, line: 360 },
       children: [new TextRun({ text: titleOf(data), size: 56 })],
     }),
     gradingTable,
     new Paragraph({
-      spacing: { before: 400, after: 120 },
+      spacing: { before: 240, after: 0, line: 360 },
       children: [new TextRun({ text: `Semester: ${data.semester}`, bold: true, size: 28 })],
     }),
+
     info("Student Name", data.studentName),
     ...(showId ? [info("Student ID", data.studentId)] : []),
     info("Batch", `${data.batch}        Section: ${data.section}`),
