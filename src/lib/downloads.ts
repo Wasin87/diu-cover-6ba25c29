@@ -239,6 +239,7 @@ export async function downloadDocx(data: GeneratedData, textPages: string[]) {
       columnSpan: opts.cs,
       children: [
         new Paragraph({
+          spacing: { before: 0, after: 0, line: 240 },
           alignment:
             opts.align === "center"
               ? AlignmentType.CENTER
@@ -247,6 +248,7 @@ export async function downloadDocx(data: GeneratedData, textPages: string[]) {
                 : AlignmentType.LEFT,
           children: [new TextRun({ text, bold: opts.bold })],
         }),
+
       ],
       ...(opts.height ? { height: { value: opts.height, rule: HeightRule.ATLEAST } } : {}),
     });
