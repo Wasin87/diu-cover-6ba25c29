@@ -141,7 +141,7 @@ export function CoverPage({ data }: { data: CoverData }) {
 
   return (
     <div id="cover-page" className="a4-page doc-page">
-      <div style={{ textAlign: "center", marginBottom: 0, marginTop: -10 }}>
+      <div style={{ textAlign: "center", marginBottom: -18, marginTop: -24 }}>
         <img
           src={diuLogo}
           alt="Daffodil International University"
@@ -154,12 +154,14 @@ export function CoverPage({ data }: { data: CoverData }) {
           textAlign: "center",
           fontSize: 38,
           fontWeight: 400,
-          margin: "4px 0 18px",
+          lineHeight: 1.5,
+          margin: "0 0 10px",
           fontFamily: "'Times New Roman', serif",
         }}
       >
         {resolveTitle(data)}
       </h1>
+
 
       <table className="a4-table">
         <tbody>
@@ -207,10 +209,11 @@ export function CoverPage({ data }: { data: CoverData }) {
         </tbody>
       </table>
 
-      <div style={{ marginTop: 36, fontSize: 15, lineHeight: 2 }}>
-        <div style={{ fontWeight: 700, fontSize: 18 }}>
+      <div style={{ marginTop: 20, fontSize: 15, lineHeight: 1.5 }}>
+        <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 4 }}>
           Semester: {data.semester}
         </div>
+
         <div>
           <strong>Student Name:</strong> {data.studentName}
         </div>
