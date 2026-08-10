@@ -314,7 +314,7 @@ export async function downloadDocx(data: GeneratedData, textPages: string[]) {
         new ImageRun({
           type: "png",
           data: logoBuf,
-          transformation: { width: 200, height: 200 },
+          transformation: { width: 260, height: 130 },
         }),
       ],
     }),
