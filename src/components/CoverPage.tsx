@@ -141,7 +141,7 @@ export function CoverPage({ data }: { data: CoverData }) {
 
   return (
     <div id="cover-page" className="a4-page doc-page">
-      <div style={{ textAlign: "center", marginBottom: -18, marginTop: -24 }}>
+      <div style={{ textAlign: "center", marginBottom: -60, marginTop: -40 }}>
         <img
           src={diuLogo}
           alt="Daffodil International University"
@@ -155,7 +155,7 @@ export function CoverPage({ data }: { data: CoverData }) {
           fontSize: 38,
           fontWeight: 400,
           lineHeight: 1.5,
-          margin: "0 0 10px",
+          margin: "0 0 8px",
           fontFamily: "'Times New Roman', serif",
         }}
       >
