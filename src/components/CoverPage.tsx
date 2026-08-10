@@ -209,10 +209,11 @@ export function CoverPage({ data }: { data: CoverData }) {
         </tbody>
       </table>
 
-      <div style={{ marginTop: 36, fontSize: 15, lineHeight: 2 }}>
-        <div style={{ fontWeight: 700, fontSize: 18 }}>
+      <div style={{ marginTop: 20, fontSize: 15, lineHeight: 1.5 }}>
+        <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 4 }}>
           Semester: {data.semester}
         </div>
+
         <div>
           <strong>Student Name:</strong> {data.studentName}
         </div>
