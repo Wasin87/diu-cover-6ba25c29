@@ -174,10 +174,7 @@ function FormPage() {
             )}
 
             {FIELD_GROUPS.map((g) => {
-              const fields =
-                selected === "assignment"
-                  ? g.fields.filter((f) => f.key !== "studentId")
-                  : g.fields;
+              const fields = g.fields;
               return (
                 <div key={g.title}>
                   <h3 className="text-[10px] sm:text-xs uppercase tracking-widest text-[#65A30D] font-bold mb-3">
