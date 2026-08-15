@@ -68,6 +68,7 @@ function FormPage() {
   const { selected, titleVariant, form, generated, extraText, images } =
     useCoverStore();
   const [loading, setLoading] = useState(false);
+  const [extraOpen, setExtraOpen] = useState(false);
 
   useEffect(() => {
     if (!selected) navigate({ to: "/" });
