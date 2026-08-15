@@ -137,7 +137,7 @@ export function CoverPage({ data }: { data: CoverData }) {
   const total = TOTAL[data.type];
   const teacherLabel =
     data.type === "lab-final" ? "Teacher Name" : "Course Teacher Name";
-  const showStudentId = data.type !== "assignment";
+  const showStudentId = true;
 
   return (
     <div id="cover-page" className="a4-page doc-page">

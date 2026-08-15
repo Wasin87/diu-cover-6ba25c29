@@ -221,7 +221,7 @@ export async function downloadDocx(data: GeneratedData, textPages: string[]) {
 
   const total = TOTAL[data.type];
   const teacherLabel = data.type === "lab-final" ? "Teacher Name" : "Course Teacher Name";
-  const showId = data.type !== "assignment";
+  const showId = true;
 
   // Logo
   const logoDataUrl = await getLogoBase64();
