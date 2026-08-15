@@ -243,87 +243,115 @@ function FormPage() {
               );
             })}
 
-            {/* Extra content */}
-            <div>
-              <h3 className="text-[10px] sm:text-xs uppercase tracking-widest text-[#65A30D] font-bold mb-3">
-                Additional Content (Optional)
-              </h3>
-
-              <div className="float-label mb-4">
-                <textarea
-                  id="extraText"
-                  placeholder=" "
-                  rows={8}
-                  value={extraText}
-                  onChange={(e) => coverStore.setExtraText(e.target.value)}
-                  style={{ minHeight: 180, resize: "vertical" }}
-                />
-                <label htmlFor="extraText">Long Text (added as pages after the cover)</label>
-              </div>
-
-              <div className="rounded-2xl border-2 border-dashed border-[#A3E635] bg-[#F7FEE7]/60 p-4 sm:p-5">
-                <label
-                  htmlFor="imageUpload"
-                  className="flex flex-col items-center justify-center cursor-pointer text-center py-4"
+            {/* Extra content — accordion */}
+            <div className="rounded-3xl border border-[#A3E635]/50 bg-white/40 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setExtraOpen((v) => !v)}
+                className="w-full flex items-center justify-between gap-3 px-4 sm:px-5 py-3.5 sm:py-4 text-left hover:bg-white/50 transition-colors"
+                aria-expanded={extraOpen}
+              >
+                <h3 className="text-[10px] sm:text-xs uppercase tracking-widest text-[#65A30D] font-bold">
+                  Additional Content (Optional)
+                </h3>
+                <span
+                  className={`shrink-0 w-8 h-8 rounded-full bg-[#F7FEE7] border border-[#A3E635]/60 flex items-center justify-center text-[#166534] transition-transform duration-300 ${extraOpen ? "rotate-180" : ""}`}
+                  aria-hidden
                 >
-                  <span className="text-3xl mb-2">🖼️</span>
-                  <span className="font-semibold text-[#166534] text-sm sm:text-base">
-                    Upload images
-                  </span>
-                  <span className="text-xs text-gray-600 mt-1">
-                    Click to add multiple images. Each image becomes a new page.
-                  </span>
-                  <input
-                    id="imageUpload"
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    className="hidden"
-                    onChange={(e) => {
-                      handleImages(e.target.files);
-                      e.target.value = "";
-                    }}
-                  />
-                </label>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </span>
+              </button>
 
-                {images.length > 0 && (
-                  <div className="mt-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-semibold text-[#65A30D]">
-                        {images.length} image{images.length > 1 ? "s" : ""} added
+              <div className={`accordion-body ${extraOpen ? "is-open" : ""}`}>
+                <div className="px-4 sm:px-5 pb-5 sm:pb-6 pt-1">
+                  <div className="float-label mb-4">
+                    <textarea
+                      id="extraText"
+                      placeholder=" "
+                      rows={8}
+                      value={extraText}
+                      onChange={(e) => coverStore.setExtraText(e.target.value)}
+                      style={{ minHeight: 180, resize: "vertical" }}
+                    />
+                    <label htmlFor="extraText">Long Text (added as pages after the cover)</label>
+                  </div>
+
+                  <div className="rounded-2xl border-2 border-dashed border-[#A3E635] bg-[#F7FEE7]/60 p-4 sm:p-5">
+                    <label
+                      htmlFor="imageUpload"
+                      className="flex flex-col items-center justify-center cursor-pointer text-center py-4"
+                    >
+                      <span className="text-3xl mb-2">🖼️</span>
+                      <span className="font-semibold text-[#166534] text-sm sm:text-base">
+                        Upload images
                       </span>
-                      <button
-                        type="button"
-                        onClick={() => coverStore.clearImages()}
-                        className="text-xs text-red-600 hover:underline"
-                      >
-                        Clear all
-                      </button>
-                    </div>
-                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                      {images.map((img) => (
-                        <div
-                          key={img.id}
-                          className="relative aspect-square rounded-lg overflow-hidden border border-[#A3E635]/50 bg-white group"
-                        >
-                          <img
-                            src={img.dataUrl}
-                            alt={`Attachment preview: ${img.name}`}
-                            className="w-full h-full object-cover"
-                          />
+                      <span className="text-xs text-gray-600 mt-1">
+                        Click to add multiple images. Each image becomes a new page.
+                      </span>
+                      <input
+                        id="imageUpload"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        className="hidden"
+                        onChange={(e) => {
+                          handleImages(e.target.files);
+                          e.target.value = "";
+                        }}
+                      />
+                    </label>
+
+                    {images.length > 0 && (
+                      <div className="mt-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-semibold text-[#65A30D]">
+                            {images.length} image{images.length > 1 ? "s" : ""} added
+                          </span>
                           <button
                             type="button"
-                            onClick={() => coverStore.removeImage(img.id)}
-                            className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white text-xs flex items-center justify-center opacity-80 hover:opacity-100"
-                            aria-label="Remove"
+                            onClick={() => coverStore.clearImages()}
+                            className="text-xs text-red-600 hover:underline"
                           >
-                            ✕
+                            Clear all
                           </button>
                         </div>
-                      ))}
-                    </div>
+                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                          {images.map((img) => (
+                            <div
+                              key={img.id}
+                              className="relative aspect-square rounded-lg overflow-hidden border border-[#A3E635]/50 bg-white group"
+                            >
+                              <img
+                                src={img.dataUrl}
+                                alt={`Attachment preview: ${img.name}`}
+                                className="w-full h-full object-cover"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => coverStore.removeImage(img.id)}
+                                className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white text-xs flex items-center justify-center opacity-80 hover:opacity-100"
+                                aria-label="Remove"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
             </div>
 
