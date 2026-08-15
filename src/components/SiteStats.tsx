@@ -11,16 +11,13 @@ export function SiteStats() {
   const [generates, setGenerates] = useState<number | null>(null);
 
   useEffect(() => {
-    let alive = true;
+    (window as unknown as { __statsEffect?: boolean }).__statsEffect = true;
     (async () => {
       const [v, g] = await Promise.all([countVisitOnce(), getStat("generates")]);
-      if (!alive) return;
+      (window as unknown as { __statsVal?: unknown }).__statsVal = [v, g];
       setVisits(v);
       setGenerates(g);
     })();
-    return () => {
-      alive = false;
-    };
   }, []);
 
   return (
