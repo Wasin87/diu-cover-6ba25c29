@@ -50,6 +50,20 @@ export const resolveTitle = (data: Pick<CoverData, "type" | "titleVariant">) => 
   return TITLES[data.type];
 };
 
+// Show yyyy-mm-dd values (from the date picker) in a readable format
+export const formatSubmissionDate = (v: string) => {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec((v || "").trim());
+  if (!m) return v;
+  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  if (Number.isNaN(d.getTime())) return v;
+  return d.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+};
+
+
 export const CRITERIA: Record<CoverType, { label: string; mark: number }[]> = {
   "lab-report": [
     { label: "Understanding/Analysis", mark: 7 },
