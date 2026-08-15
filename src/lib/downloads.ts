@@ -1,4 +1,4 @@
-import { TOTAL, CRITERIA, resolveTitle, type CoverData } from "@/components/CoverPage";
+import { TOTAL, CRITERIA, resolveTitle, formatSubmissionDate, type CoverData } from "@/components/CoverPage";
 import diuLogo from "@/assets/diu-logo.png";
 
 type GeneratedData = CoverData & {
@@ -336,7 +336,7 @@ export async function downloadDocx(data: GeneratedData, textPages: string[]) {
     info("Course Name", data.courseName),
     info(teacherLabel, data.teacherName),
     info("Designation", data.designation),
-    info("Submission Date", data.submissionDate),
+    info("Submission Date", formatSubmissionDate(data.submissionDate)),
   ];
 
   // Image pages — one per image, each preceded by page break

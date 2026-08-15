@@ -253,7 +253,7 @@ export function CoverPage({ data }: { data: CoverData }) {
           <strong>Designation:</strong> {data.designation}
         </div>
         <div>
-          <strong>Submission Date:</strong> {data.submissionDate}
+          <strong>Submission Date:</strong> {formatSubmissionDate(data.submissionDate)}
         </div>
       </div>
     </div>
