@@ -46,10 +46,11 @@ const FIELD_GROUPS = [
     fields: [
       { key: "teacherName", label: "Teacher Name" },
       { key: "designation", label: "Designation" },
-      { key: "submissionDate", label: "Submission Date" },
+      { key: "submissionDate", label: "Submission Date", type: "date" },
     ],
   },
 ] as const;
+
 
 const TYPE_TITLE = TITLES;
 
