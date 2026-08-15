@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { coverStore, useCoverStore } from "@/lib/cover-store";
 import type { CoverType } from "@/components/CoverPage";
 import diuLogo from "@/assets/diu-logo.png";
+import { SiteStats } from "@/components/SiteStats";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -183,6 +184,7 @@ function SiteFooter() {
             <p className="text-[10px] sm:text-sm text-white/80 mt-1">
               © {new Date().getFullYear()} DIU Cover. All rights reserved.
             </p>
+            <SiteStats />
           </div>
           <div className="flex items-center gap-3">
             <SocialIcon
