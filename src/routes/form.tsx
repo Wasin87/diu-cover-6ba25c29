@@ -5,6 +5,7 @@ import { coverStore, useCoverStore } from "@/lib/cover-store";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { TOTAL, TITLES, TITLE_VARIANTS } from "@/components/CoverPage";
 import { MobileNav } from "./index";
+import { hitStat } from "@/lib/stats";
 
 export const Route = createFileRoute("/form")({
   head: () => ({
@@ -100,6 +101,7 @@ function FormPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    void hitStat("generates");
     setTimeout(() => {
       coverStore.setGenerated({
         ...form,
