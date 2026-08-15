@@ -112,8 +112,9 @@ function FormPage() {
       setLoading(false);
       setDone(true);
       toast.success("Cover page generated!", {
-        description: "Tap “View Cover Page” to preview & download.",
+        description: "Opening preview & download...",
       });
+      navigate({ to: "/preview" });
     }, 1500);
   };
 
