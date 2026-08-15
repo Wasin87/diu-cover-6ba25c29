@@ -46,10 +46,11 @@ const FIELD_GROUPS = [
     fields: [
       { key: "teacherName", label: "Teacher Name" },
       { key: "designation", label: "Designation" },
-      { key: "submissionDate", label: "Submission Date" },
+      { key: "submissionDate", label: "Submission Date", type: "date" },
     ],
   },
 ] as const;
+
 
 const TYPE_TITLE = TITLES;
 
@@ -183,23 +184,59 @@ function FormPage() {
                     {g.title}
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                    {fields.map((f) => (
-                      <div className="float-label" key={f.key}>
-                        <input
-                          id={f.key}
-                          placeholder=" "
-                          required
-                          value={form[f.key as keyof typeof form]}
-                          onChange={(e) =>
-                            coverStore.updateField(
-                              f.key as keyof typeof form,
-                              e.target.value,
-                            )
-                          }
-                        />
-                        <label htmlFor={f.key}>{f.label}</label>
-                      </div>
-                    ))}
+                    {fields.map((f) => {
+                      const isDate = "type" in f && f.type === "date";
+                      return (
+                        <div
+                          className={`float-label${isDate ? " is-date" : ""}`}
+                          key={f.key}
+                        >
+                          <input
+                            id={f.key}
+                            type={isDate ? "date" : "text"}
+                            placeholder=" "
+                            required
+                            value={form[f.key as keyof typeof form]}
+                            onChange={(e) =>
+                              coverStore.updateField(
+                                f.key as keyof typeof form,
+                                e.target.value,
+                              )
+                            }
+                            onClick={(e) => {
+                              if (!isDate) return;
+                              const el = e.currentTarget as HTMLInputElement & {
+                                showPicker?: () => void;
+                              };
+                              try {
+                                el.showPicker?.();
+                              } catch {
+                                /* not supported */
+                              }
+                            }}
+                          />
+                          <label htmlFor={f.key}>{f.label}</label>
+                          {isDate && (
+                            <span className="date-icon" aria-hidden>
+                              <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <rect x="3" y="4" width="18" height="18" rx="2" />
+                                <path d="M16 2v4M8 2v4M3 10h18" />
+                              </svg>
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+
                   </div>
                 </div>
               );
