@@ -6,6 +6,7 @@ export type StatKey = "visits" | "generates";
 async function call(path: string): Promise<number | null> {
   try {
     const res = await fetch(`${BASE}/${path}`, { cache: "no-store" });
+    if (res.status === 404) return 0;
     if (!res.ok) return null;
     const json = (await res.json()) as { value?: number };
     return typeof json.value === "number" ? json.value : null;
