@@ -66,7 +66,6 @@ function FormPage() {
   const { selected, titleVariant, form, generated, extraText, images } =
     useCoverStore();
   const [loading, setLoading] = useState(false);
-  const [done, setDone] = useState(!!generated);
 
   useEffect(() => {
     if (!selected) navigate({ to: "/" });
@@ -110,7 +109,7 @@ function FormPage() {
         images,
       });
       setLoading(false);
-      setDone(true);
+
       toast.success("Cover page generated!", {
         description: "Opening preview & download...",
       });
