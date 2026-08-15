@@ -127,6 +127,23 @@ body {
   top: 4px; font-size: 11px; color: #65A30D; font-weight: 600;
 }
 
+/* Date field: label always floated, custom calendar icon */
+.float-label.is-date input[type="date"] { padding-right: 44px; }
+.float-label.is-date label {
+  top: 4px; font-size: 11px; color: #65A30D; font-weight: 600;
+}
+.float-label.is-date input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0; position: absolute; right: 0; top: 0;
+  width: 44px; height: 100%; cursor: pointer;
+}
+.float-label.is-date .date-icon {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
+  color: #65A30D; background: #F7FEE7; border-radius: 8px;
+  border: 1px solid rgba(132,204,22,0.4); cursor: pointer; pointer-events: none;
+}
+
+
 @keyframes slideInRight {
   from { opacity: 0; transform: translateX(40px); }
   to { opacity: 1; transform: translateX(0); }
