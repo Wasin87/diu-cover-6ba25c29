@@ -66,7 +66,6 @@ function FormPage() {
   const { selected, titleVariant, form, generated, extraText, images } =
     useCoverStore();
   const [loading, setLoading] = useState(false);
-  const [done, setDone] = useState(!!generated);
 
   useEffect(() => {
     if (!selected) navigate({ to: "/" });
@@ -110,10 +109,11 @@ function FormPage() {
         images,
       });
       setLoading(false);
-      setDone(true);
+
       toast.success("Cover page generated!", {
-        description: "Tap “View Cover Page” to preview & download.",
+        description: "Opening preview & download...",
       });
+      navigate({ to: "/preview" });
     }, 1500);
   };
 
@@ -297,15 +297,6 @@ function FormPage() {
               ✨ Generate Cover Page
             </button>
 
-            {done && (
-              <Link
-                to="/preview"
-                className="relative block w-full text-center py-4 rounded-2xl font-display text-lg sm:text-xl tracking-wide text-white shadow-[0_18px_40px_-12px_rgba(22,101,52,0.75)] bg-gradient-to-r from-[#166534] via-[#3f6212] to-[#65A30D] ring-2 ring-[#A3E635] hover:scale-[1.02] active:scale-95 transition-all animate-[pop-in_.5s_cubic-bezier(.2,.8,.2,1)_both] overflow-hidden"
-              >
-                <span className="absolute inset-0 rounded-2xl ring-4 ring-[#A3E635]/40 animate-pulse pointer-events-none" />
-                <span className="relative z-10">👁️ View Cover Page</span>
-              </Link>
-            )}
 
           </form>
         </div>
