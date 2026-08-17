@@ -237,7 +237,9 @@ export function CoverPage({ data }: { data: CoverData }) {
           </div>
         )}
         <div>
-          <strong>Batch:</strong> {data.batch} &nbsp;&nbsp;&nbsp;&nbsp;
+          <strong>Batch:</strong> {data.batch}
+        </div>
+        <div>
           <strong>Section:</strong> {data.section}
         </div>
         <div>
