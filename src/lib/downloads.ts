@@ -331,7 +331,8 @@ export async function downloadDocx(data: GeneratedData, textPages: string[]) {
 
     info("Student Name", data.studentName),
     ...(showId ? [info("Student ID", data.studentId)] : []),
-    info("Batch", `${data.batch}        Section: ${data.section}`),
+    info("Batch", data.batch),
+    info("Section", data.section),
     info("Course Code", data.courseCode),
     info("Course Name", data.courseName),
     info(teacherLabel, data.teacherName),
